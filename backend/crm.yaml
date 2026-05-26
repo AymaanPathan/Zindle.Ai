@@ -1,0 +1,25 @@
+name: crm
+version: "1"
+dsl_version: 3
+
+backend: jsonl
+
+tables:
+  - name: clients
+    description: CRM clients
+    source:
+      location: file:///mnt/d/coral-project/backend/coral-data/
+      glob: "clients.jsonl"
+
+    columns:
+      - name: id
+        type: Utf8
+
+      - name: email
+        type: Utf8
+
+      - name: client_name
+        type: Utf8
+
+      - name: risk_score
+        type: Int64

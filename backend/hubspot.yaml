@@ -1,0 +1,141 @@
+name: hubspot
+version: 0.1.0
+dsl_version: 3
+backend: http
+
+inputs:
+  HUBSPOT_ACCESS_TOKEN:
+    kind: secret
+    hint: HubSpot Private App access token
+
+base_url: https://api.hubapi.com
+
+auth:
+  type: HeaderAuth
+  headers:
+    - name: Authorization
+      from: template
+      template: Bearer {{input.HUBSPOT_ACCESS_TOKEN}}
+
+tables:
+
+  # ───────────────── CONTACTS ─────────────────
+
+  - name: contacts
+    description: HubSpot CRM contacts
+
+    request:
+      method: GET
+      path: "/crm/v3/objects/contacts?limit=100&properties=firstname,lastname,email,company,lifecyclestage,createdate"
+
+    response:
+      rows_path:
+        - results
+
+    columns:
+      - name: id
+        type: Utf8
+
+      - name: firstname
+        type: Utf8
+        expr:
+          kind: path
+          path:
+            - properties
+            - firstname
+
+      - name: lastname
+        type: Utf8
+        expr:
+          kind: path
+          path:
+            - properties
+            - lastname
+
+      - name: email
+        type: Utf8
+        expr:
+          kind: path
+          path:
+            - properties
+            - email
+
+      - name: company
+        type: Utf8
+        expr:
+          kind: path
+          path:
+            - properties
+            - company
+
+      - name: lifecyclestage
+        type: Utf8
+        expr:
+          kind: path
+          path:
+            - properties
+            - lifecyclestage
+
+      - name: createdate
+        type: Utf8
+        expr:
+          kind: path
+          path:
+            - properties
+            - createdate
+
+  # ───────────────── SALES EMAIL EVENTS ─────────────────
+
+  - name: email_events
+    description: HubSpot sales email tracking events
+
+    request:
+      method: GET
+      path: "/sales-email/v1/email-events"
+
+    response:
+      rows_path:
+        - results
+
+    columns:
+      - name: id
+        type: Utf8
+        expr:
+          kind: path
+          path:
+            - id
+
+      - name: recipient
+        type: Utf8
+        expr:
+          kind: path
+          path:
+            - recipient
+
+      - name: type
+        type: Utf8
+        expr:
+          kind: path
+          path:
+            - type
+
+      - name: created
+        type: Utf8
+        expr:
+          kind: path
+          path:
+            - created
+
+      - name: subject
+        type: Utf8
+        expr:
+          kind: path
+          path:
+            - subject
+
+      - name: sender
+        type: Utf8
+        expr:
+          kind: path
+          path:
+            - sender

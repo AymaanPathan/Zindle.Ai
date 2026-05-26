@@ -1,0 +1,16 @@
+dsl_version: 3
+version: "1"
+name: email_events_local
+backend: postgres
+
+connection:
+  host: aws-1-ap-northeast-2.pooler.supabase.com
+  port: 6543
+  database: postgres
+  user: postgres.zkjuyulyiqfqxtjqptvi
+  password: Inpay@20031234
+  ssl: true
+
+tables:
+  - name: email_events
+    description: Email engagement events from Resend webhooks
