@@ -1,0 +1,172 @@
+# ─── Dependencies ───────────────────────────────
+node_modules/
+
+# ─── Build Output ───────────────────────────────
+dist/
+build/
+.vite/
+
+# ─── Environment Variables ──────────────────────
+.env
+.env.local
+.env.development
+.env.production
+.env.*.local
+
+# ─── TypeScript ─────────────────────────────────
+*.tsbuildinfo
+
+# ─── Logs ───────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ─── OS ─────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Editor ─────────────────────────────────────
+.vscode/
+.idea/
+*.suo
+*.swp
+*.swo
+
+# ─── Coral ──────────────────────────────────────
+.coral/
+coral.lock
+
+# ─── Vite ───────────────────────────────────────
+.vite-cache/
+
+# ─── Tailwind ───────────────────────────────────
+.postcss-cache/
+
+# ─── Runtime / Process ──────────────────────────
+pids/
+*.pid
+*.seed
+
+# ─── Testing ────────────────────────────────────
+coverage/
+.nyc_output/
+# =========================
+# ROOT
+# =========================
+.DS_Store
+Thumbs.db
+*.log
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Desktop.ini
+
+# =========================
+# FRONTEND (Next.js)
+# =========================
+
+# Dependencies
+frontend/node_modules/
+
+# Next.js
+frontend/.next/
+frontend/out/
+frontend/build/
+
+# Logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# TypeScript
+frontend/*.tsbuildinfo
+frontend/next-env.d.ts
+
+# Coverage
+frontend/coverage/
+
+# Testing
+frontend/playwright-report/
+frontend/test-results/
+
+# Cache
+frontend/.turbo/
+frontend/.cache/
+
+# Vercel
+frontend/.vercel/
+
+# =========================
+# BACKEND (Node + TS)
+# =========================
+
+# Dependencies
+backend/node_modules/
+
+# Build output
+backend/dist/
+backend/build/
+
+# Logs
+backend/logs/
+backend/*.log
+backend/npm-debug.log*
+
+# TypeScript
+backend/*.tsbuildinfo
+
+# Runtime
+backend/tmp/
+backend/uploads/
+
+# =========================
+# CORAL
+# =========================
+
+# Coral local runtime/cache
+backend/.coral/
+
+# Optional:
+# Ignore secrets but KEEP mock data
+backend/*.secret
+backend/*.key
+
+# If you ever store real exports:
+# backend/coral-data/*.csv
+# backend/coral-data/*.json
+
+# =========================
+# DOCKER
+# =========================
+
+docker-compose.override.yml
+
+# =========================
+# TESTING / COVERAGE
+# =========================
+
+coverage/
+.nyc_output/
+
+# =========================
+# MISC
+# =========================
+
+*.pem
+*.pid
+*.seed
+*.pid.lock
