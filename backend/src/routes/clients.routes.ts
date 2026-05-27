@@ -11,13 +11,13 @@ function deriveRiskLevel(c: {
   paid_invoice_count: number;
   open_invoice_count: number;
   total_due: number;
-  total_paid: number;           // ← now correctly computed
+  total_paid: number;           
   is_fully_paid: boolean;
 }): "healthy" | "medium" | "high" | "critical" {
   const { invoice_count, open_invoice_count, total_due, is_fully_paid } = c;
 
   if (invoice_count === 0) return "healthy";
-  if (is_fully_paid) return "healthy";           // ← key fix: trust isFullyPaid
+  if (is_fully_paid) return "healthy";     
   if (open_invoice_count === 0 && total_due <= 0) return "healthy";
   if (c.total_paid === 0 && invoice_count > 0) return "critical";
   if (c.paid_invoice_count === 0) return "high";
@@ -38,14 +38,7 @@ router.get("/clients", async (_req, res) => {
       const paidInvoiceCount = Number(c.paid_invoice_count ?? 0);
       const openInvoiceCount = Number(c.open_invoice_count ?? 0);
 
-      // ─── KEY FIX ───────────────────────────────────────────────────────
-      // Stripe's amount_paid column is unreliable in test mode (stays 0
-      // even after payment). Use the accounting identity instead:
-      //   effective_paid = total_invoiced − total_due
-      // total_due is SUM(amount_due − amount_paid) which IS correct from
-      // Stripe, so this subtraction gives the true collected amount.
       const totalPaid = Math.max(0, totalInvoiced - totalDue);
-      // ──────────────────────────────────────────────────────────────────
 
       const isFullyPaid = invoiceCount > 0 && openInvoiceCount === 0;
 
@@ -65,17 +58,16 @@ router.get("/clients", async (_req, res) => {
         // Billing
         invoiceCount,
         totalInvoiced,
-        totalPaid,           // ← now correct
+        totalPaid,           
         totalDue,
         paidInvoiceCount,
         openInvoiceCount,
 
-        // Derived
-        paymentRate,         // ← now correct
+        paymentRate,         
         isFullyPaid,
         lastPaymentAt:       c.last_payment_at        ?? null,
         earliestOpenDueDate: c.earliest_open_due_date ?? null,
-
+        currency: (c.currency ?? "INR").toUpperCase(),
         riskLevel: deriveRiskLevel({
           invoice_count:      invoiceCount,
           paid_invoice_count: paidInvoiceCount,
@@ -108,8 +100,7 @@ router.get("/clients", async (_req, res) => {
   }
 });
 
-// ─── NEW: GET /api/clients/:email/invoices ────────────────────────────────────
-// Returns all invoices for a client with individual paid/unpaid status
+
 router.get("/clients/:email/invoices", async (req, res) => {
   const email = decodeURIComponent(req.params.email).trim();
 

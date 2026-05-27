@@ -11,14 +11,15 @@ export interface Client {
   invoiceCount: number;
   totalInvoiced: number;
   totalDue: number;
-  totalPaid: number;           // ← add
-  paidInvoiceCount: number;    // ← add
-  openInvoiceCount: number;    // ← add
-  paymentRate: number | null;  // ← add
-  isFullyPaid: boolean;        // ← add
+  totalPaid: number;           
+  paidInvoiceCount: number;    
+  openInvoiceCount: number;    
+  paymentRate: number | null;  
+  isFullyPaid: boolean;        
   lastPaymentAt: number | null;
   earliestOpenDueDate: number | null;
-  riskLevel: "healthy" | "medium" | "high" | "critical"; // ← add
+  currency: string;
+  riskLevel: "healthy" | "medium" | "high" | "critical"; 
 }
 export interface JourneyEvent {
   id: string;

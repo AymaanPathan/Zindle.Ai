@@ -216,11 +216,11 @@ const css = `
 function inits(n: string, e: string) {
   return (n || e || "?").split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase();
 }
-function fmt(c: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0 }).format(c / 100);
+function fmt(c: number, currency = "INR") {
+  return new Intl.NumberFormat("en-IN", { style: "currency", currency, minimumFractionDigits: 0 }).format(c / 100);
 }
-function fmtK(c: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", notation: "compact", maximumFractionDigits: 1 }).format(c / 100);
+function fmtK(c: number, currency = "INR") {
+  return new Intl.NumberFormat("en-IN", { style: "currency", currency, notation: "compact", maximumFractionDigits: 1 }).format(c / 100);
 }
 
 // Replace the entire Risk component:
@@ -291,7 +291,7 @@ export default function Dashboard() {
         {/* Stats */}
         <div className="d-stats">
           {[
-            { label: "Outstanding",   val: fmtK(totalDue),         hint: `${clients.length} clients`,  icon: "$" },
+            { label: "Outstanding",   val: fmtK(totalDue, "INR"),         hint: `${clients.length} clients`,  icon: "$" },
             { label: "High Risk",     val: String(highRisk),        hint: "need attention",             icon: "⚠" },
             { label: "Total Clients", val: String(clients.length),  hint: "tracked accounts",           icon: "◫" },
            { label: "Paid Invoices", val: String(paid), hint: "across all clients", icon: "✓" },
@@ -374,7 +374,7 @@ export default function Dashboard() {
                     <td><span className="d-cinv">{client.invoiceCount}</span></td>
 
                     {/* Amount */}
-                    <td><span className="d-camt">{fmt(client.totalDue)}</span></td>
+                  <span className="d-camt">{fmt(client.totalDue, (client as any).currency ?? "INR")}</span>
 
                     {/* Risk */}
                     <td><Risk client={client} /></td>
