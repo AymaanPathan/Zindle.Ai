@@ -1,8 +1,6 @@
-// src/risk/collector.ts
-import { coralMultiSql } from "../coral/mcp";
+import { runCoralQuery } from "../coral/client";
+import { supabase } from "../lib/supabase";
 import { AggregatedSignals, HubSpotSignals, StripeSignals } from "./signals";
-
-// ───────────────── Helpers ─────────────────
 
 function daysSince(val?: string | number | null): number | undefined {
   if (val == null) return undefined;
@@ -19,93 +17,86 @@ function safeNum(val: any, fallback = 0): number {
   return isNaN(n) ? fallback : n;
 }
 
-// ───────────────── Collector ─────────────────
+async function fetchEngagementMap(): Promise<Map<string, any>> {
+  const map = new Map<string, any>();
+  try {
+    const { data, error } = await supabase
+      .from("email_events")
+      .select("email, type, created");
+
+    if (error) {
+      console.warn("⚠️ engagement fetch failed:", error.message);
+      return map;
+    }
+
+    for (const row of data ?? []) {
+      const key = row.email?.toLowerCase();
+      if (!key) continue;
+
+      const existing = map.get(key) ?? {
+        total_sent:  0,
+        total_opens: 0,
+        last_open:   null as string | null,
+      };
+
+      if (row.type === "sent")    existing.total_sent++;
+      if (row.type === "opened") {
+        existing.total_opens++;
+        if (!existing.last_open || row.created > existing.last_open)
+          existing.last_open = row.created;
+      }
+
+      map.set(key, existing);
+    }
+
+    console.log(`✅ engagement: ${map.size} contacts from Supabase`);
+  } catch (err: any) {
+    console.warn("⚠️ engagement fetch exception:", err.message);
+  }
+  return map;
+}
 
 export async function collectAllSignals(): Promise<Map<string, AggregatedSignals>> {
-  console.log("📡 Collecting signals — 1 coralMultiSql call across Stripe + HubSpot...");
+  console.log("📡 Collecting signals...");
 
-  // ── One call, five queries, one persistent Coral process ──────────────
-  const results = await coralMultiSql({
-
-    // 1. HubSpot contacts — source of truth for which customers we score
-    contacts: `
+  const [contacts, stripeRisk, stripeHistory, engagementMap] = await Promise.all([
+    runCoralQuery<any[]>(`
       SELECT id, email, firstname, lastname, company, lifecyclestage
       FROM hubspot.contacts
       WHERE email IS NOT NULL
-    `,
-
-    // 2. Stripe open invoice risk — overdue, failed, outstanding
-    stripeRisk: `
+    `),
+    runCoralQuery<any[]>(`
       SELECT
         customer_email,
-        COUNT(*)                                              AS open_invoice_count,
-        SUM(amount_due - amount_paid)                         AS total_amount_due,
-        MAX(DATEDIFF('day', due_date, CURRENT_DATE))          AS max_days_overdue,
+        COUNT(*) AS open_invoice_count,
+        SUM(amount_due - amount_paid) AS total_amount_due,
+        MIN(due_date) AS earliest_due_date,
         SUM(CASE WHEN status = 'uncollectible' THEN 1 ELSE 0 END) AS failed_payments
       FROM stripe.invoices
       WHERE status NOT IN ('paid', 'void')
       GROUP BY customer_email
-    `,
-
-    // 3. Stripe payment history — success rate + historical lateness
-    stripeHistory: `
+    `),
+    runCoralQuery<any[]>(`
       SELECT
         customer_email,
-        COUNT(*)                                              AS total_invoices,
-        SUM(CASE WHEN status = 'paid' THEN 1 ELSE 0 END)     AS paid_invoices,
-        SUM(
-          CASE
-            WHEN status = 'paid'
-              AND status_transitions__paid_at > due_date
-            THEN 1 ELSE 0
-          END
-        )                                                     AS historically_late
+        COUNT(*) AS total_invoices,
+        SUM(CASE WHEN status = 'paid' THEN 1 ELSE 0 END) AS paid_invoices,
+        SUM(CASE WHEN status = 'paid' AND status_transitions__paid_at > due_date THEN 1 ELSE 0 END) AS historically_late
       FROM stripe.invoices
+      WHERE status != 'void'
       GROUP BY customer_email
-    `,
+    `),
+    fetchEngagementMap(),
+  ]);
 
-    // 4. HubSpot engagement — reply/open signals per contact
-    hubspotEngagement: `
-      SELECT
-        recipient                                             AS email,
-        MAX(CASE WHEN type = 'REPLY' THEN created END)        AS last_reply,
-        MAX(CASE WHEN type = 'OPEN'  THEN created END)        AS last_open,
-        SUM(CASE WHEN type = 'OPEN'  THEN 1 ELSE 0 END)       AS total_opens,
-        SUM(CASE WHEN type = 'REPLY' THEN 1 ELSE 0 END)       AS total_replies,
-        COUNT(*)                                              AS total_sent,
-        SUM(CASE WHEN type = 'BOUNCE' THEN 1 ELSE 0 END)      AS total_bounces
-      FROM hubspot.email_events
-      GROUP BY recipient
-    `,
+  console.log(`✅ contacts: ${contacts.length}, stripeRisk: ${stripeRisk.length}, stripeHistory: ${stripeHistory.length}`);
 
-    // 5. All unique emails from Stripe — catches Stripe customers
-    //    not yet in HubSpot so we can flag the gap
-    stripeEmails: `
-      SELECT DISTINCT LOWER(customer_email) AS email
-      FROM stripe.invoices
-      WHERE customer_email IS NOT NULL
-    `,
-  });
+  const stripeRiskMap    = new Map(stripeRisk.map(r => [r.customer_email?.toLowerCase(), r]));
+  const stripeHistoryMap = new Map(stripeHistory.map(r => [r.customer_email?.toLowerCase(), r]));
 
-  console.log(
-    `✅ Raw rows — contacts: ${results.contacts.length}, ` +
-    `stripeRisk: ${results.stripeRisk.length}, ` +
-    `stripeHistory: ${results.stripeHistory.length}, ` +
-    `engagement: ${results.hubspotEngagement.length}`
-  );
-
-  // ── Build O(1) lookup maps ────────────────────────────────────────────
-  const stripeRiskMap    = new Map(results.stripeRisk.map(r =>
-    [r.customer_email?.toLowerCase(), r]));
-  const stripeHistoryMap = new Map(results.stripeHistory.map(r =>
-    [r.customer_email?.toLowerCase(), r]));
-  const engagementMap    = new Map(results.hubspotEngagement.map(r =>
-    [r.email?.toLowerCase(), r]));
-
-  // ── Aggregate — HubSpot contacts are the join key ─────────────────────
   const signalMap = new Map<string, AggregatedSignals>();
 
-  for (const contact of results.contacts) {
+  for (const contact of contacts) {
     const key = contact.email?.toLowerCase();
     if (!key) continue;
 
@@ -116,8 +107,19 @@ export async function collectAllSignals(): Promise<Map<string, AggregatedSignals
     const totalInvoices = safeNum(sh?.total_invoices);
     const paidInvoices  = safeNum(sh?.paid_invoices);
 
+    const daysOverdue = sr?.earliest_due_date
+  ? (() => {
+      const raw = sr.earliest_due_date;
+      const n = Number(raw);
+      const d = !isNaN(n) && n > 1_000_000_000
+        ? new Date(n * 1000)        // Unix seconds → ms
+        : new Date(raw as string);  // ISO string
+      return Math.max(0, Math.floor((Date.now() - d.getTime()) / 86_400_000));
+    })()
+  : 0;
+
     const stripe: StripeSignals = {
-      daysOverdue:          safeNum(sr?.max_days_overdue),
+      daysOverdue,
       hasFailedPayment:     safeNum(sr?.failed_payments) > 0,
       openInvoiceCount:     safeNum(sr?.open_invoice_count),
       totalAmountDue:       safeNum(sr?.total_amount_due),
@@ -125,20 +127,20 @@ export async function collectAllSignals(): Promise<Map<string, AggregatedSignals
       paymentSuccessRate:   totalInvoices > 0 ? paidInvoices / totalInvoices : 1,
     };
 
-    const totalSent    = safeNum(eg?.total_sent);
-    const totalReplies = safeNum(eg?.total_replies);
-    const totalOpens   = safeNum(eg?.total_opens);
+    const totalSent  = safeNum(eg?.total_sent);
+    const totalOpens = safeNum(eg?.total_opens);
+    const lastOpen   = eg?.last_open ?? null;
 
     const hubspot: HubSpotSignals = {
-      daysSinceLastReply:    daysSince(eg?.last_reply) ?? 999,
-      daysSinceLastOpen:     daysSince(eg?.last_open),
-      openedButNeverReplied: totalOpens > 0 && totalReplies === 0,
-      totalIgnoredEmails:    Math.max(0, totalSent - totalReplies),
-      hasActiveMeeting:      false, // extend: add hubspot.meetings query when available
+      daysSinceLastReply:    daysSince(lastOpen) ?? 999, // use last email open as proxy
+      daysSinceLastOpen:     daysSince(lastOpen),
+      openedButNeverReplied: false,                      // not applicable for Resend events
+      totalIgnoredEmails:    Math.max(0, totalSent - totalOpens),
+      hasActiveMeeting:      false,
       lifecycleStage:        contact.lifecyclestage ?? "unknown",
     };
 
-    signalMap.set(contact.email, {
+    signalMap.set(key, {
       email:       contact.email,
       name:        [contact.firstname, contact.lastname].filter(Boolean).join(" ") || undefined,
       company:     contact.company ?? undefined,
@@ -152,10 +154,7 @@ export async function collectAllSignals(): Promise<Map<string, AggregatedSignals
   return signalMap;
 }
 
-// ── Single-customer path — reuses the batch, no extra queries ────────────────
-export async function collectSignalsForEmail(
-  email: string
-): Promise<AggregatedSignals | null> {
+export async function collectSignalsForEmail(email: string): Promise<AggregatedSignals | null> {
   const all = await collectAllSignals();
   return all.get(email.toLowerCase()) ?? null;
 }
