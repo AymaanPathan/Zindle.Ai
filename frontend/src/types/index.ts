@@ -1,4 +1,3 @@
-// ─── Invoice Types ───────────────────────────────────────────────────────────
 
 export interface Invoice {
   invoice_id: string;

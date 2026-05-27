@@ -1,4 +1,3 @@
-// src/types/client.types.ts
 
 export type RiskLevel = "high" | "medium" | "low";
 
