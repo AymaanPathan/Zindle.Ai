@@ -258,16 +258,16 @@ const css = `
 `;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function fmt(cents: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency", currency: "USD", minimumFractionDigits: 0,
+function fmt(cents: number, currency = "INR") {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency", currency,
+    minimumFractionDigits: 0,
   }).format(cents / 100);
 }
-
-function fmtK(cents: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency", currency: "USD", notation: "compact", maximumFractionDigits: 1,
+function fmtK(cents: number, currency = "INR") {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency", currency,
+    notation: "compact", maximumFractionDigits: 1,
   }).format(cents / 100);
 }
 
@@ -385,7 +385,7 @@ function AIRiskPanel({ aiEnabled, onToggleAI, loading, loadingAll, summary, onOp
             <div className="ai-shimmer" style={{ height: 28, width: "75%", marginTop: 4 }} />
           ) : (
             <div className="ai-stat-value" style={{ color: totalAmountAtRisk > 0 ? "#f87171" : "#34d399" }}>
-              {fmtK(totalAmountAtRisk)}
+             {fmtK(totalAmountAtRisk, "INR")}
             </div>
           )}
           <div className="ai-stat-hint">open exposure</div>
@@ -535,7 +535,7 @@ function AIRiskPanel({ aiEnabled, onToggleAI, loading, loadingAll, summary, onOp
                     fontSize: 12, fontWeight: 500, color: "#94a3b8",
                     fontFamily: "var(--sans)", letterSpacing: "-0.01em", flexShrink: 0,
                   }}>
-                    {fmtK(c.totalDue)}
+                   {fmtK(c.totalDue, "INR")}
                   </div>
                 )}
 
@@ -694,7 +694,7 @@ function CustomerCard({ client, delay, aiEnabled, riskScore }: {
             fontSize: 22, fontWeight: 400, color: client.isFullyPaid ? "#16a34a" : "#111827",
             letterSpacing: "-0.02em", lineHeight: 1,
           }}>
-            {fmt(client.totalDue)}
+          {fmt(client.totalDue, (client as any).currency ?? "INR")}
           </div>
         </div>
         <div>
@@ -874,7 +874,7 @@ export default function Activity() {
             animationDelay: "0.05s",
           }}>
             {[
-              { label: "Outstanding",   val: fmtK(totalDue),         hint: `${clients.length} clients`,  icon: "$" },
+              { label: "Outstanding",  val: fmtK(totalDue, "INR"),         hint: `${clients.length} clients`,  icon: "$" },
               { label: "High Risk",     val: String(highRiskCount),   hint: "need attention",             icon: "⚠" },
               { label: "Total Clients", val: String(clients.length),  hint: "tracked accounts",           icon: "◫" },
               { label: "Paid Invoices", val: String(settledCount),    hint: "across all clients",         icon: "✓" },

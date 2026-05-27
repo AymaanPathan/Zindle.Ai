@@ -16,6 +16,7 @@ export const queries = {
       COALESCE(SUM(s.amount_due),      0)           AS total_invoiced,
       COALESCE(SUM(s.amount_paid),     0)           AS total_paid,
       COALESCE(SUM(s.amount_due - s.amount_paid), 0) AS total_due,
+      MAX(s.currency) AS currency,
 
       COALESCE(SUM(CASE WHEN s.status = 'paid'
                         THEN 1 ELSE 0 END), 0)      AS paid_invoice_count,

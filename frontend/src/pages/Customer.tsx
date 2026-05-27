@@ -222,11 +222,17 @@ const css = `
 
 // ─── Formatters ───────────────────────────────────────────────────────────────
 
-function fmt(cents: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0 }).format(cents / 100);
+function fmt(cents: number, currency = "INR") {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency", currency,
+    minimumFractionDigits: 0,
+  }).format(cents / 100);
 }
-function fmtK(cents: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", notation: "compact", maximumFractionDigits: 1 }).format(cents / 100);
+function fmtK(cents: number, currency = "INR") {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency", currency,
+    notation: "compact", maximumFractionDigits: 1,
+  }).format(cents / 100);
 }
 function fmtDate(val: any): string {
   if (!val) return "—";
@@ -602,7 +608,7 @@ function ComposeWindow({ email, onClose }: { email: string; onClose: () => void 
 
 // ─── Invoice Table ────────────────────────────────────────────────────────────
 
-function InvoiceTable({ invoices }: { invoices: CustomerInvoice[] }) {
+function InvoiceTable({ invoices, currency }: { invoices: CustomerInvoice[]; currency: string }) {
   if (!invoices.length) return (
     <div style={{ padding: "48px 20px", textAlign: "center", fontSize: 13, color: "#9ca3af", fontFamily: "var(--sans)" }}>No invoices found.</div>
   );
@@ -625,9 +631,9 @@ function InvoiceTable({ invoices }: { invoices: CustomerInvoice[] }) {
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 500, padding: "3px 8px", borderRadius: 99, background: s.bg, color: s.color, border: `1px solid ${s.border}`, letterSpacing: "-0.01em" }}>{inv.status}</span>
                   {inv.is_overdue && <div style={{ fontSize: 10.5, color: "#b91c1c", marginTop: 3, fontWeight: 500 }}>{inv.days_overdue}d overdue</div>}
                 </td>
-                <td><span style={{ fontSize: 13, fontWeight: 600, color: "#111827", fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}>{fmt(inv.amount_due)}</span></td>
-                <td><span style={{ fontSize: 13, color: "#16a34a", fontVariantNumeric: "tabular-nums" }}>{fmt(inv.amount_paid)}</span></td>
-                <td><span style={{ fontSize: 13, fontWeight: inv.amount_remaining > 0 ? 600 : 400, color: inv.amount_remaining > 0 ? "#b91c1c" : "#9ca3af", fontVariantNumeric: "tabular-nums" }}>{fmt(inv.amount_remaining)}</span></td>
+                <td><span style={{ fontSize: 13, fontWeight: 600, color: "#111827", fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}>{fmt(inv.amount_due, currency)}</span></td>
+                <td><span style={{ fontSize: 13, color: "#16a34a", fontVariantNumeric: "tabular-nums" }}>{fmt(inv.amount_paid, currency)}</span></td>
+                <td><span style={{ fontSize: 13, fontWeight: inv.amount_remaining > 0 ? 600 : 400, color: inv.amount_remaining > 0 ? "#b91c1c" : "#9ca3af", fontVariantNumeric: "tabular-nums" }}>{fmt(inv.amount_remaining, currency)}</span></td>
                 <td>
                   <div style={{ fontSize: 12.5, color: inv.is_overdue ? "#b91c1c" : "#374151" }}>{inv.due_date_fmt}</div>
                   {inv.paid_at_fmt !== "—" && <div style={{ fontSize: 10.5, color: "#9ca3af", marginTop: 2 }}>paid {inv.paid_at_fmt}</div>}
@@ -774,7 +780,8 @@ function RiskIntelTab({ email }: { email: string }) {
           {[
             {
               label: "Amount due",
-              value: totalAmountDue > 0 ? fmtK(totalAmountDue) : "$0",
+             value: totalAmountDue > 0 ? fmtK(totalAmountDue) : "₹0",
+
               sub: totalAmountDue > 0 ? "outstanding" : "all clear",
               color: totalAmountDue > 0 ? "#111827" : "#16a34a",
               flag: totalAmountDue > 50000,
@@ -989,7 +996,7 @@ function RiskIntelTab({ email }: { email: string }) {
             },
             {
               key: "Total amount due",
-              value: fmtK(stripe.totalAmountDue ?? 0),
+            value: fmtK(stripe.totalAmountDue ?? 0, "INR"),
               flag: (stripe.totalAmountDue ?? 0) > 50000,
             },
             {
@@ -1080,6 +1087,8 @@ export default function CustomerProfile() {
 
   const contact = profile?.contact;
   const summary = profile?.summary;
+  const currency = summary?.currency ?? profile?.invoices?.[0]?.currency ?? "INR";
+
   const risk    = getRisk(summary?.risk_level ?? "medium");
   const name    = contact ? `${contact.firstname ?? ""} ${contact.lastname ?? ""}`.trim() || email : email;
 
@@ -1184,9 +1193,9 @@ export default function CustomerProfile() {
             {/* Stat cards */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
               {[
-                { label: "Outstanding",    val: fmtK(summary?.total_due ?? 0),      hint: `${summary?.unpaid_count ?? 0} unpaid`,  icon: "$" },
-                { label: "Collected",      val: fmtK(summary?.total_paid ?? 0),      hint: "all time",                              icon: "✓" },
-                { label: "Total Invoiced", val: fmtK(summary?.total_invoiced ?? 0),  hint: "lifetime",                              icon: "◫" },
+                { label: "Outstanding",     val: fmtK(summary?.total_due ?? 0, currency),      hint: `${summary?.unpaid_count ?? 0} unpaid`,  icon: "$" },
+                { label: "Collected",      val: fmtK(summary?.total_paid ?? 0, currency),      hint: "all time",                              icon: "✓" },
+                { label: "Total Invoiced", val: fmtK(summary?.total_invoiced ?? 0, currency),  hint: "lifetime",                              icon: "◫" },
                 { label: "Overdue",        val: String(summary?.overdue_count ?? 0), hint: "invoices past due",                     icon: "⚠" },
               ].map(({ label, val, hint, icon }) => (
                 <div key={label} style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: "18px 20px", background: "#fff", transition: "border-color 0.15s" }}
@@ -1249,7 +1258,7 @@ export default function CustomerProfile() {
                 )}
               </div>
 
-              {tab === "invoices" && <InvoiceTable invoices={profile.invoices} />}
+              {tab === "invoices" && <InvoiceTable invoices={profile.invoices} currency={currency} />}
 
               {tab === "emails" && (
                 <div style={{ padding: "0 20px" }}>

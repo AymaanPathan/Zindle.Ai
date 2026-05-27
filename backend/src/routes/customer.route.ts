@@ -292,7 +292,7 @@
               s.amount_due, s.amount_paid,
               (s.amount_due - s.amount_paid) AS amount_remaining,
               s.created, s.due_date, s.status_transitions__paid_at,
-              s.hosted_invoice_url, s.invoice_pdf
+              s.hosted_invoice_url, s.invoice_pdf, s.currency
             FROM hubspot.contacts h
             LEFT JOIN stripe.invoices s
               ON LOWER(s.customer_email) = LOWER(h.email)
@@ -316,7 +316,7 @@
             amount_due: r.amount_due, amount_paid: r.amount_paid,
             amount_remaining: r.amount_remaining, created: r.created,
             due_date: r.due_date, status_transitions__paid_at: r.status_transitions__paid_at,
-            hosted_invoice_url: r.hosted_invoice_url, invoice_pdf: r.invoice_pdf,
+            hosted_invoice_url: r.hosted_invoice_url, invoice_pdf: r.invoice_pdf, currency: r.currency,
           }));
 
         if (!contact && !invoices.length) {
@@ -338,6 +338,7 @@
             amount_remaining:   amountRemaining,
             hosted_invoice_url: inv.hosted_invoice_url ?? null,
             invoice_pdf:        inv.invoice_pdf ?? null,
+            currency: (inv.currency ?? "inr").toUpperCase(),
             is_overdue:   !isPaid && !["void"].includes(inv.status) && daysOverdue(inv.due_date) > 0,
             days_overdue: isPaid ? 0 : daysOverdue(inv.due_date),
             created_fmt:  fmtDate(inv.created),
@@ -387,6 +388,7 @@
               ? new Date(lastPayment * 1000).toISOString()
               : null,
             risk_level,
+            currency: (invoices[0]?.currency ?? "inr").toUpperCase(),
           },
         });
       } catch (err: any) {
@@ -434,7 +436,7 @@
               s.amount_due, s.amount_paid,
               (s.amount_due - s.amount_paid) AS amount_remaining,
               s.created, s.due_date, s.status_transitions__paid_at,
-              s.hosted_invoice_url, s.invoice_pdf
+              s.hosted_invoice_url, s.invoice_pdf, s.currency
             FROM hubspot.contacts h
             LEFT JOIN stripe.invoices s
               ON LOWER(s.customer_email) = LOWER(h.email)

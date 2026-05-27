@@ -31,6 +31,8 @@ export interface CustomerInvoice {
   days_overdue: number;
   created_fmt: string;
   due_date_fmt: string;
+  currency: string;
+
   paid_at_fmt: string;
 }
 
@@ -54,6 +56,8 @@ export interface CustomerSummary {
   last_payment_date: string | null;
   risk_level: "healthy" | "medium" | "high" | "critical";
     is_fully_paid: boolean; 
+    currency: string;
+
 }
 
 export interface CustomerProfile {
