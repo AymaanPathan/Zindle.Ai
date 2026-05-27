@@ -3,15 +3,10 @@ import { collectAllSignals, collectSignalsForEmail } from "../risk/collector";
 import { calculateRiskScore } from "../risk/scorer";
 import { generateRiskInsight, generateBatchInsights } from "../ai/ai";
 import { RiskProfile } from "../risk/signals";
+import { runCoralQuery } from "../coral/client";
 
 const router = Router();
 
-// ─── GET /api/risk/all ────────────────────────────────────────────────────────
-// Returns risk scores for ALL customers, sorted by score descending.
-// Query params:
-//   ?ai=true         — include AI insights (only for high_risk + critical)
-//   ?category=high_risk  — filter by category
-//   ?minScore=50     — filter by minimum score
 
 router.get("/risk/all", async (req: Request, res: Response) => {
   try {
@@ -40,7 +35,6 @@ router.get("/risk/all", async (req: Request, res: Response) => {
     // 4. Sort by score descending (most at-risk first)
     profiles.sort((a, b) => b.score - a.score);
 
-    // 5. Optionally enrich with AI insights
     let aiInsights: Map<string, any> = new Map();
     if (includeAI && profiles.length > 0) {
       aiInsights = await generateBatchInsights(profiles, {
@@ -86,9 +80,6 @@ router.get("/risk/all", async (req: Request, res: Response) => {
   }
 });
 
-// ─── GET /api/risk/summary ────────────────────────────────────────────────────
-// Fast overview — just category counts + top 5 critical customers.
-// No AI. Meant for dashboard header widgets.
 
 router.get("/risk/summary", async (_req: Request, res: Response) => {
   try {
@@ -133,12 +124,8 @@ router.get("/risk/summary", async (_req: Request, res: Response) => {
   }
 });
 
-// ─── GET /api/risk/:email ─────────────────────────────────────────────────────
-// Deep risk profile for a single customer.
-// Query params:
-//   ?ai=true  — include AI insight (default: true)
 
-router.get("/risk/:email", async (req: Request, res: Response) => {
+router.get("/risk/:email(*)", async (req: Request, res: Response) => {
   try {
     const { email } = req.params;
     const includeAI = req.query.ai !== "false"; // default true
@@ -159,12 +146,22 @@ router.get("/risk/:email", async (req: Request, res: Response) => {
 
     // 2. Score
     const profile = calculateRiskScore(signals);
+   const [invoices] = await Promise.all([
+    runCoralQuery<any[]>(`
+      SELECT number, status, amount_due, amount_paid,
+        due_date, status_transitions__paid_at, hosted_invoice_url
+      FROM stripe.invoices
+      WHERE LOWER(customer_email) = LOWER('${email.replace(/'/g, "''")}')
+      ORDER BY created DESC
+    `).catch(() => []),
+  ]);
 
+    
     // 3. AI insight
     let ai = null;
     if (includeAI) {
       try {
-        ai = await generateRiskInsight(profile);
+        ai = await generateRiskInsight(profile, invoices);
       } catch (aiErr: any) {
         console.error("⚠️ AI insight failed (non-fatal):", aiErr.message);
       }
