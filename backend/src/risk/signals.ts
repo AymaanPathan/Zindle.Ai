@@ -1,12 +1,10 @@
-// src/risk/signals.ts
-
 export interface StripeSignals {
   daysOverdue: number;
   hasFailedPayment: boolean;
   openInvoiceCount: number;
   totalAmountDue: number;
   previousLatePayments: number;
-  paymentSuccessRate: number;   // 0–1, derived from status counts
+  paymentSuccessRate: number;  
 }
 
 export interface HubSpotSignals {
