@@ -39,12 +39,31 @@ async function callGroq(messages: GroqMessage[]): Promise<string> {
 
 // ─── Build context string from risk profile ───────────────────────────────────
 
-function buildProfileContext(profile: RiskProfile): string {
+function buildProfileContext(profile: RiskProfile, invoices?: any[]): string {
   const { email, name, company, score, category, breakdown, signals } = profile;
 
   const breakdownText = breakdown
     .map((b) => `  - [${b.source.toUpperCase()}] ${b.reason} (+${b.points} pts)`)
     .join("\n");
+
+  // Format invoice details
+  const invoiceLines = invoices?.map(inv => {
+    const due = inv.due_date
+      ? new Date(Number(inv.due_date) * 1000).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })
+      : "—";
+    const paidAt = inv.status_transitions__paid_at
+      ? new Date(Number(inv.status_transitions__paid_at) * 1000).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })
+      : null;
+    const amount = `$${(Number(inv.amount_due) / 100).toLocaleString()}`;
+    const daysUntilDue = inv.due_date
+      ? Math.floor((Number(inv.due_date) * 1000 - Date.now()) / 86_400_000)
+      : null;
+    const dueLine = daysUntilDue !== null
+      ? daysUntilDue >= 0 ? `due in ${daysUntilDue}d (${due})` : `${Math.abs(daysUntilDue)}d overdue (${due})`
+      : due;
+
+    return `  - #${inv.number}: ${amount} — ${inv.status.toUpperCase()} — ${dueLine}${paidAt ? ` — paid ${paidAt}` : ""}${inv.hosted_invoice_url ? ` — ${inv.hosted_invoice_url}` : ""}`;
+  }).join("\n") ?? "  No invoice data";
 
   return `
 CUSTOMER: ${name ?? email}${company ? ` at ${company}` : ""}
@@ -54,18 +73,21 @@ RISK SCORE: ${score} / CATEGORY: ${category.toUpperCase()}
 RISK SIGNALS DETECTED:
 ${breakdownText || "  No risk signals detected"}
 
+INVOICES:
+${invoiceLines}
+
 RAW SIGNAL DATA:
   Stripe:
     - Days overdue: ${signals.stripe.daysOverdue}
     - Open invoices: ${signals.stripe.openInvoiceCount}
-    - Total amount due: $${signals.stripe.totalAmountDue}
+    - Total amount due: $${(signals.stripe.totalAmountDue / 100).toLocaleString()}
     - Failed payments: ${signals.stripe.hasFailedPayment ? "YES" : "no"}
     - Historical late payments: ${signals.stripe.previousLatePayments}
     - Payment success rate: ${Math.round(signals.stripe.paymentSuccessRate * 100)}%
 
-  CRM (HubSpot):
+  Engagement:
+    - Days since last email open: ${signals.hubspot.daysSinceLastReply === 999 ? "no data" : signals.hubspot.daysSinceLastReply}
     - Lifecycle stage: ${signals.hubspot.lifecycleStage}
-    - Days since last reply: ${signals.hubspot.daysSinceLastReply === 999 ? "unknown" : signals.hubspot.daysSinceLastReply}
   `.trim();
 }
 
@@ -77,12 +99,13 @@ export interface AIInsight {
   urgency: "low" | "medium" | "high" | "immediate";
 }
 
-export async function generateRiskInsight(profile: RiskProfile): Promise<AIInsight> {
-  const context = buildProfileContext(profile);
+export async function generateRiskInsight(profile: RiskProfile, invoices?: any[]): Promise<AIInsight> {
+  const context = buildProfileContext(profile, invoices);
 
-  const systemPrompt = `You are a B2B customer success AI assistant.
+const systemPrompt = `You are a B2B customer success AI assistant.
 Your job is to analyze customer risk signals and generate actionable insights for account managers.
 Be concise, specific, and direct. Do NOT be vague or generic.
+IMPORTANT: All monetary amounts in the profile are already in USD dollars (e.g. $16,500 means sixteen thousand five hundred dollars). Do not multiply or modify these amounts.
 Always respond with valid JSON only — no markdown, no explanation outside the JSON.`;
 
   const userPrompt = `

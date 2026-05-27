@@ -8,21 +8,25 @@ const CORAL_PATH = process.env.CORAL_PATH || (() => {
 
 console.log(`[MCP] CORAL_PATH: ${CORAL_PATH}`);
 
+// ─── Persistent singleton client ──────────────────────────────────────────────
+// Previously: spawn → init → query → kill  (for EVERY query — cold start cost every time)
+// Now:        spawn → init ONCE → reuse forever → auto-reconnect on crash
 
 type PendingRequest = {
   resolve: (v: any) => void;
   reject: (e: Error) => void;
   timer: NodeJS.Timeout;
 };
-
+  
 class CoralMcpClient {
   private proc: ChildProcessWithoutNullStreams | null = null;
   private initialized = false;
   private initializing = false;
-  private reqId = 10; 
+  private reqId = 10; // start above 1 so init IDs never collide
   private buffer = "";
   private pending = new Map<number, PendingRequest>();
 
+  // ── Internal: read stdout and dispatch to waiting promises ─────────────────
   private handleData(chunk: Buffer): void {
     this.buffer += chunk.toString();
     const lines = this.buffer.split("\n");
@@ -44,6 +48,7 @@ class CoralMcpClient {
     }
   }
 
+  // ── Internal: send one JSON-RPC request and await its response ──────────────
   private sendRaw(req: object, timeoutMs = 20_000): Promise<any> {
     return new Promise((resolve, reject) => {
       const id = (req as any).id;
@@ -57,6 +62,7 @@ class CoralMcpClient {
     });
   }
 
+  // ── Internal: boot process and run initialize handshake ────────────────────
   private async boot(): Promise<void> {
     if (this.proc && !this.proc.killed) {
       this.proc.kill();
@@ -83,6 +89,7 @@ class CoralMcpClient {
       this.initialized = false;
     });
 
+    // MCP initialize handshake
     await this.sendRaw({
       jsonrpc: "2.0", id: 1, method: "initialize",
       params: {
@@ -108,9 +115,11 @@ class CoralMcpClient {
     this.pending.clear();
   }
 
+  // ── Public: get (or create) a live process ─────────────────────────────────
   async getClient(): Promise<this> {
     if (this.initialized && this.proc && !this.proc.killed) return this;
 
+    // Prevent concurrent initialization races
     if (this.initializing) {
       await new Promise<void>((res) => {
         const check = setInterval(() => {
@@ -129,6 +138,7 @@ class CoralMcpClient {
     return this;
   }
 
+  // ── Public: run a SQL query ────────────────────────────────────────────────
   async sql(query: string): Promise<any[]> {
     await this.getClient();
     const id = this.reqId++;
@@ -142,10 +152,12 @@ class CoralMcpClient {
     return parseResult(result, `sql:${id}`);
   }
 
+  // ── Public: run multiple queries over the same live connection ─────────────
   async multiSql(queries: Record<string, string>): Promise<Record<string, any[]>> {
     await this.getClient();
     const results: Record<string, any[]> = {};
 
+    // Run sequentially (Coral MCP is stateful — safer than concurrent)
     for (const [key, query] of Object.entries(queries)) {
       const id = this.reqId++;
       console.log(`\n[CoralMulti:${key}] id=${id}\n${query.slice(0, 200)}`);
@@ -159,6 +171,7 @@ class CoralMcpClient {
     return results;
   }
 
+  // ── Public: list all available tables ─────────────────────────────────────
   async listTables(): Promise<string> {
     await this.getClient();
     const id = this.reqId++;
@@ -170,31 +183,64 @@ class CoralMcpClient {
   }
 }
 
+// ── Parse Coral's JSON-in-text response format ─────────────────────────────
 
 function parseResult(result: any, label: string): any[] {
-  const text = result?.content?.[0]?.text ?? result?.content ?? result;
-  if (typeof text === "string") {
+  // Try content[0].text first (standard MCP response)
+  const raw = result?.content?.[0]?.text 
+    ?? result?.content?.[0] 
+    ?? result?.content 
+    ?? result;
+
+  if (typeof raw === "string") {
+    // Coral sometimes returns CSV-like or has a wrapper object — strip it
+    const trimmed = raw.trim();
+    
+    // Try direct JSON parse
     try {
-      const parsed = JSON.parse(text);
+      const parsed = JSON.parse(trimmed);
       if (Array.isArray(parsed)) return parsed;
       if (parsed?.rows && Array.isArray(parsed.rows)) return parsed.rows;
       if (parsed?.data && Array.isArray(parsed.data)) return parsed.data;
-      return [parsed];
+      // Single object result
+      if (typeof parsed === "object" && parsed !== null) return [parsed];
     } catch {
-      console.warn(`[MCP:parse:${label}] JSON parse failed`);
-      return [{ raw: text }];
+      // Try extracting JSON array from within the string
+      // Coral sometimes prepends status text before the JSON
+      const arrayMatch = trimmed.match(/\[[\s\S]*\]/);
+      if (arrayMatch) {
+        try {
+          const parsed = JSON.parse(arrayMatch[0]);
+          if (Array.isArray(parsed)) return parsed;
+        } catch {}
+      }
+      // Try extracting JSON object
+      const objMatch = trimmed.match(/\{[\s\S]*\}/);
+      if (objMatch) {
+        try {
+          const parsed = JSON.parse(objMatch[0]);
+          if (parsed?.rows && Array.isArray(parsed.rows)) return parsed.rows;
+          if (parsed?.data && Array.isArray(parsed.data)) return parsed.data;
+          return [parsed];
+        } catch {}
+      }
+      console.warn(`[MCP:parse:${label}] JSON parse failed — raw:`, trimmed.slice(0, 200));
+      return [{ raw }];
     }
   }
-  if (Array.isArray(text)) return text;
+
+  if (Array.isArray(raw)) return raw;
   return [];
 }
-
+// ── Singleton instance — one process for the lifetime of the server ──────────
 const coral = new CoralMcpClient();
 
+// Graceful shutdown
 process.on("exit", () => {
   try { (coral as any).proc?.kill(); } catch {}
 });
 
+// ── Public API ────────────────────────────────────────────────────────────────
 
 export async function coralSql(query: string): Promise<any[]> {
   return coral.sql(query);

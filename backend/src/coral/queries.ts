@@ -36,6 +36,7 @@ export const queries = {
     ORDER BY h.createdate DESC
   `,
 
+
   getAllHubspotContacts: `
     SELECT
       id,
@@ -50,6 +51,7 @@ export const queries = {
     ORDER BY createdate DESC
   `,
 
+
   getHubspotContactByEmail: (email: string) => `
     SELECT
       id,
@@ -63,6 +65,7 @@ export const queries = {
     WHERE LOWER(email) = LOWER('${email}')
     LIMIT 1
   `,
+
 
   getRecentInvoices: `
     SELECT
@@ -88,7 +91,6 @@ export const queries = {
     LIMIT 20
   `,
 
-
   getRevenueByStatus: `
     SELECT
       s.status,
@@ -102,7 +104,6 @@ export const queries = {
     GROUP BY s.status
     ORDER BY total_revenue DESC
   `,
-
 
   getTopCustomers: `
     SELECT
@@ -121,7 +122,7 @@ export const queries = {
     LIMIT 10
   `,
 
-
+ 
   getInvoiceById: (id: string) => `
     SELECT
       s.id,
@@ -224,7 +225,7 @@ getCustomerProfileAndInvoices: (email: string) => `
     ORDER BY s.created ASC
   `,
 
-
+ 
   getInvoicesByDateRange: (
     from: string,
     to: string,
@@ -252,6 +253,7 @@ getCustomerProfileAndInvoices: (email: string) => `
       ${email ? `AND LOWER(s.customer_email) = LOWER('${email}')` : ""}
     ORDER BY s.created DESC
   `,
+
 
   getJourneyInvoiceById: (invoiceId: string) => `
     SELECT
@@ -370,7 +372,7 @@ getCustomerProfileAndInvoices: (email: string) => `
     ORDER BY month ASC
   `,
 
-
+ 
   getHubspotEmailEvents: (email: string) => `
     SELECT
       recipient,
@@ -592,7 +594,6 @@ getCustomerProfileAndInvoices: (email: string) => `
     ORDER BY total_due DESC
   `,
 
-
   searchCustomers: (term: string) => `
     SELECT
       h.id                                          AS hubspot_id,
@@ -617,7 +618,6 @@ getCustomerProfileAndInvoices: (email: string) => `
     ORDER BY total_due DESC
     LIMIT 20
   `,
-
 
   getCustomerByInvoiceId: (invoiceId: string) => `
     SELECT

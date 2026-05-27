@@ -4,13 +4,24 @@ name: email_events_local
 backend: postgres
 
 connection:
-  host: ${SUPABASE_HOST}
-  port: ${SUPABASE_PORT}
-  database: ${SUPABASE_DB}
-  user: ${SUPABASE_USER}
-  password: ${SUPABASE_PASSWORD}
+  host: aws-1-ap-northeast-2.pooler.supabase.com
+  port: 6543
+  database: postgres
+  user: postgres.zkjuyulyiqfqxtjqptvi
+  password: Inpay@20031234
   ssl: true
 
 tables:
   - name: email_events
     description: Email engagement events from Resend webhooks
+    columns:
+      - name: id
+        type: Utf8
+      - name: email
+        type: Utf8
+      - name: type
+        type: Utf8
+      - name: created
+        type: Utf8
+      - name: raw
+        type: Utf8

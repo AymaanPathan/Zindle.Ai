@@ -9,6 +9,7 @@ import { queries } from "./coral/queries";
 import journeyRouter from "./routes/journey.route";
 import customerRouter       from "./routes/customer.route"; 
 import resendWebhookRouter from "./routes/webhooks.routes";
+import riskRouter from "./routes/risk.routes";
 import chatRouter from "./routes/chat.route"; 
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.use("/api", clientsRouter);
 app.use("/api", journeyRouter);
 app.use("/api", chatRouter);
 app.use("/api", customerRouter); 
+app.use("/api", riskRouter);
 app.get("/invoices", async (req: Request, res: Response) => {
   try {
     const data = await runCoralQuery(queries.getRecentInvoices);
