@@ -7,7 +7,6 @@ import { openCustomer } from "../store/slices/uiSlice";
 import type { Client } from "../store/slices/clientSlice";
 import type { TopRiskCustomer } from "../types";
 
-
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&display=swap');
 
@@ -24,17 +23,9 @@ const css = `
     --g900: #111827;
     --serif: 'Instrument Serif', Georgia, serif;
     --sans:  'Geist', -apple-system, system-ui, sans-serif;
-    --ai-bg: #0d1117;
-    --ai-border: #1e293b;
-    --ai-text: #e2e8f0;
-    --ai-muted: #64748b;
-    --ai-accent: #38bdf8;
-    --ai-amber: #fbbf24;
-    --ai-red: #f87171;
-    --ai-green: #34d399;
     font-family: var(--sans);
     -webkit-font-smoothing: antialiased;
-    background: var(--w);
+    background: #fafafa;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -46,6 +37,16 @@ const css = `
   .ac-scroll::-webkit-scrollbar-track { background: transparent; }
   .ac-scroll::-webkit-scrollbar-thumb { background: var(--g200); border-radius: 99px; }
 
+  .ac-search-wrap {
+    display: flex; align-items: center; gap: 7px;
+    background: #fff; border: 1px solid var(--g200);
+    border-radius: 8px; padding: 0 12px; height: 34px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .ac-search-wrap:focus-within {
+    border-color: var(--g400);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.04);
+  }
   .ac-search-input {
     border: none; background: transparent; outline: none;
     font-size: 13px; color: var(--g900); width: 180px;
@@ -53,60 +54,68 @@ const css = `
   }
   .ac-search-input::placeholder { color: var(--g400); }
 
-  .ac-filter {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 5px 12px; border-radius: 99px;
+  .ac-filter-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    height: 30px; padding: 0 11px; border-radius: 6px;
     border: 1px solid var(--g200); background: var(--w);
     font-size: 12.5px; font-weight: 400; color: var(--g500);
     cursor: pointer; font-family: var(--sans);
     letter-spacing: -0.01em; transition: all 0.1s;
+    white-space: nowrap;
   }
-  .ac-filter:hover:not(.active) {
+  .ac-filter-pill:hover:not(.active) {
     background: var(--g50); border-color: var(--g300); color: var(--g900);
   }
-  .ac-filter.active {
+  .ac-filter-pill.active {
     background: var(--g900); border-color: var(--g900); color: #fff; font-weight: 500;
+  }
+  .ac-filter-pill .pill-count {
+    font-size: 10.5px; font-weight: 500;
+    padding: 1px 5px; border-radius: 4px;
+  }
+  .ac-filter-pill.active .pill-count {
+    background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.8);
+  }
+  .ac-filter-pill:not(.active) .pill-count {
+    background: var(--g100); color: var(--g400); border: 1px solid var(--g200);
   }
 
   .ac-card {
     background: var(--w);
     border: 1px solid var(--g200);
-    border-radius: 14px;
-    padding: 20px;
+    border-radius: 12px;
+    padding: 16px;
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    transition: border-color 0.15s, box-shadow 0.15s;
+    gap: 14px;
+    transition: border-color 0.12s, box-shadow 0.12s, transform 0.12s;
   }
   .ac-card:hover {
     border-color: var(--g300);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    transform: translateY(-1px);
   }
-  .ac-card:hover .ac-card-arrow {
-    background: var(--g900); border-color: var(--g900);
-  }
-  .ac-card:hover .ac-card-arrow svg path { stroke: #fff; }
 
   @keyframes ac-shimmer {
     0%   { background-position: -500px 0; }
     100% { background-position:  500px 0; }
   }
   .ac-shimmer {
-    background: linear-gradient(90deg, var(--g100) 0%, var(--g50) 50%, var(--g100) 100%) !important;
+    background: linear-gradient(90deg, var(--g100) 0%, #f8f9fa 50%, var(--g100) 100%) !important;
     background-size: 500px 100% !important;
     animation: ac-shimmer 1.5s ease infinite !important;
-    border-radius: 6px;
+    border-radius: 5px;
   }
 
   @keyframes ac-in {
-    from { opacity: 0; transform: translateY(8px); }
+    from { opacity: 0; transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0); }
   }
-  .ac-in { animation: ac-in 0.25s ease both; }
+  .ac-in { animation: ac-in 0.2s ease both; }
 
   .ac-select {
-    padding: 6px 10px; border-radius: 7px;
+    height: 34px; padding: 0 10px; border-radius: 7px;
     border: 1px solid var(--g200); background: var(--w);
     font-size: 12.5px; color: var(--g600); cursor: pointer;
     font-family: var(--sans); outline: none; letter-spacing: -0.01em;
@@ -114,205 +123,176 @@ const css = `
   }
   .ac-select:hover { border-color: var(--g300); }
 
-  .ac-refresh {
+  .ac-ghost-btn {
     display: inline-flex; align-items: center; gap: 5px;
-    padding: 6px 12px; border-radius: 7px;
+    height: 34px; padding: 0 12px; border-radius: 7px;
     border: 1px solid var(--g200); background: var(--w);
     font-size: 12.5px; font-weight: 400; color: var(--g600);
     cursor: pointer; font-family: var(--sans); letter-spacing: -0.01em;
-    transition: all 0.12s;
+    transition: all 0.1s;
   }
-  .ac-refresh:hover { background: var(--g50); color: var(--g900); border-color: var(--g300); }
+  .ac-ghost-btn:hover { background: var(--g50); color: var(--g900); border-color: var(--g300); }
 
-  /* ── AI Panel ── */
+  /* AI Risk Panel — light mode */
   .ai-panel {
-    background: var(--ai-bg);
-    border-radius: 16px;
-    border: 1px solid var(--ai-border);
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid var(--g200);
     overflow: hidden;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
   }
 
   .ai-panel-header {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--ai-border);
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--g100);
+    background: var(--g50);
   }
 
   .ai-badge {
     display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(56,189,248,0.12);
-    border: 1px solid rgba(56,189,248,0.25);
-    border-radius: 99px;
-    padding: 3px 10px;
-    font-size: 11px; font-weight: 600;
-    color: var(--ai-accent);
-    letter-spacing: 0.06em; text-transform: uppercase;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    padding: 3px 9px;
+    font-size: 10.5px; font-weight: 600;
+    color: #1d4ed8;
+    letter-spacing: 0.04em; text-transform: uppercase;
     font-family: var(--sans);
   }
 
   .ai-toggle {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 7px 14px; border-radius: 8px;
-    border: 1px solid var(--ai-border);
-    background: rgba(255,255,255,0.04);
-    font-size: 12px; font-weight: 500; color: var(--ai-text);
+    display: inline-flex; align-items: center; gap: 7px;
+    height: 30px; padding: 0 12px; border-radius: 6px;
+    border: 1px solid var(--g200);
+    background: #fff;
+    font-size: 12px; font-weight: 500; color: var(--g600);
     cursor: pointer; font-family: var(--sans);
-    transition: all 0.15s; letter-spacing: -0.01em;
+    transition: all 0.12s; letter-spacing: -0.01em;
   }
-  .ai-toggle:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); }
+  .ai-toggle:hover { background: var(--g50); border-color: var(--g300); color: var(--g900); }
   .ai-toggle.active {
-    background: rgba(56,189,248,0.1);
-    border-color: rgba(56,189,248,0.3);
-    color: var(--ai-accent);
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #1d4ed8;
   }
-
-  .ai-toggle-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--ai-muted); transition: background 0.15s;
-    flex-shrink: 0;
-  }
-  .ai-toggle.active .ai-toggle-dot { background: var(--ai-accent); }
-
-  @keyframes ai-pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
-  .ai-pulse { animation: ai-pulse 1.5s ease infinite; }
 
   .ai-stat {
-    padding: 20px;
-    border-right: 1px solid var(--ai-border);
-    display: flex; flex-direction: column; gap: 6px;
+    padding: 18px 20px;
+    border-right: 1px solid var(--g100);
   }
   .ai-stat:last-child { border-right: none; }
 
   .ai-stat-label {
-    font-size: 10px; font-weight: 600; color: var(--ai-muted);
-    text-transform: uppercase; letter-spacing: 0.1em;
-    font-family: var(--sans);
+    font-size: 10px; font-weight: 600; color: var(--g400);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 8px; font-family: var(--sans);
   }
 
   .ai-stat-value {
     font-family: 'Instrument Serif', Georgia, serif;
-    font-size: 28px; font-weight: 400; line-height: 1;
-    letter-spacing: -0.02em;
+    font-size: 26px; font-weight: 400; line-height: 1;
+    letter-spacing: -0.02em; color: var(--g900);
   }
 
   .ai-stat-hint {
-    font-size: 11px; color: var(--ai-muted);
+    font-size: 11px; color: var(--g400);
     font-family: var(--sans); letter-spacing: -0.01em;
+    margin-top: 4px;
   }
 
-  /* risk bar */
   .risk-bar-track {
-    height: 4px; border-radius: 99px;
-    background: rgba(255,255,255,0.06);
-    overflow: hidden; margin-top: 8px;
+    height: 2px; border-radius: 99px;
+    background: var(--g100);
+    overflow: hidden; margin-top: 10px;
   }
   .risk-bar-fill {
     height: 100%; border-radius: 99px;
     transition: width 0.6s cubic-bezier(0.16,1,0.3,1);
   }
 
-  /* top risk list */
   .ai-risk-row {
-    display: flex; align-items: center; gap: 12px;
-    padding: 10px 20px;
-    border-bottom: 1px solid var(--ai-border);
-    transition: background 0.1s; cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--g100);
+    transition: background 0.08s; cursor: pointer;
   }
   .ai-risk-row:last-child { border-bottom: none; }
-  .ai-risk-row:hover { background: rgba(255,255,255,0.03); }
+  .ai-risk-row:hover { background: var(--g50); }
 
   .ai-risk-rank {
-    width: 18px; text-align: center;
-    font-size: 10px; font-weight: 600; color: var(--ai-muted);
-    font-family: var(--sans); flex-shrink: 0;
+    width: 18px; text-align: right;
+    font-size: 10px; font-weight: 600; color: var(--g300);
+    font-family: var(--sans); flex-shrink: 0; font-variant-numeric: tabular-nums;
   }
 
   .ai-risk-score-bar {
-    flex: 1; height: 3px; border-radius: 99px;
-    background: rgba(255,255,255,0.06); overflow: hidden;
+    flex: 1; height: 2px; border-radius: 99px;
+    background: var(--g100); overflow: hidden;
   }
 
-  @keyframes ai-shimmer {
+  @keyframes ai-shimmer-light {
     0%   { background-position: -300px 0; }
     100% { background-position:  300px 0; }
   }
   .ai-shimmer {
-    background: linear-gradient(90deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 100%) !important;
+    background: linear-gradient(90deg, var(--g100) 0%, var(--g50) 50%, var(--g100) 100%) !important;
     background-size: 300px 100% !important;
-    animation: ai-shimmer 1.5s ease infinite !important;
+    animation: ai-shimmer-light 1.5s ease infinite !important;
     border-radius: 5px;
   }
 
-  /* AI insight chip on cards */
   .ai-chip {
     display: inline-flex; align-items: center; gap: 4px;
-    font-size: 10px; font-weight: 500;
-    padding: 2px 7px; border-radius: 5px;
-    letter-spacing: -0.01em; font-family: var(--sans);
+    font-size: 10px; font-weight: 600;
+    padding: 2px 6px; border-radius: 4px;
+    letter-spacing: 0; font-family: var(--sans);
     flex-shrink: 0;
   }
+
+  @keyframes ai-pulse-light {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+  }
+  .ai-pulse { animation: ai-pulse-light 2s ease infinite; }
 `;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function fmt(cents: number, currency = "INR") {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency", currency,
-    minimumFractionDigits: 0,
-  }).format(cents / 100);
+  return new Intl.NumberFormat("en-IN", { style: "currency", currency, minimumFractionDigits: 0 }).format(cents / 100);
 }
 function fmtK(cents: number, currency = "INR") {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency", currency,
-    notation: "compact", maximumFractionDigits: 1,
-  }).format(cents / 100);
+  return new Intl.NumberFormat("en-IN", { style: "currency", currency, notation: "compact", maximumFractionDigits: 1 }).format(cents / 100);
 }
-
 function inits(name: string, email: string) {
   const n = name?.trim();
   if (n) {
-    const parts = n.split(" ");
-    return parts.length >= 2
-      ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
-      : n.slice(0, 2).toUpperCase();
+    const p = n.split(" ");
+    return p.length >= 2 ? (p[0][0] + p[p.length - 1][0]).toUpperCase() : n.slice(0, 2).toUpperCase();
   }
   return (email ?? "?").slice(0, 2).toUpperCase();
 }
-
 function getRisk(client: Client) {
-  if (client.isFullyPaid || client.riskLevel === "healthy") {
-    return { label: "Settled", dot: "#22c55e", color: "#14532d", bg: "#f0fdf4", border: "#d1fae5" };
-  }
-  if (client.riskLevel === "critical" || client.riskLevel === "high") {
-    return { label: "High risk", dot: "#ef4444", color: "#b91c1c", bg: "#fef2f2", border: "#fecaca" };
-  }
-  if (client.riskLevel === "medium") {
-    return { label: "Review", dot: "#f59e0b", color: "#92400e", bg: "#fffbeb", border: "#fde68a" };
-  }
+  if (client.isFullyPaid || client.riskLevel === "healthy") return { label: "Settled", dot: "#22c55e", color: "#15803d", bg: "#f0fdf4", border: "#d1fae5" };
+  if (client.riskLevel === "critical" || client.riskLevel === "high") return { label: "High risk", dot: "#ef4444", color: "#b91c1c", bg: "#fef2f2", border: "#fecaca" };
+  if (client.riskLevel === "medium") return { label: "Review", dot: "#f59e0b", color: "#92400e", bg: "#fffbeb", border: "#fde68a" };
   return { label: "Pending", dot: "#3b82f6", color: "#1e40af", bg: "#eff6ff", border: "#bfdbfe" };
 }
-
-function getRiskColor(level: string): string {
-  if (level === "critical") return "#f87171";
-  if (level === "high" || level === "high_risk") return "#fb923c";
-  if (level === "medium" || level === "watch") return "#fbbf24";
-  return "#34d399";
+function getRiskColor(level: string) {
+  if (level === "critical") return "#ef4444";
+  if (level === "high" || level === "high_risk") return "#f97316";
+  if (level === "medium" || level === "watch") return "#f59e0b";
+  return "#22c55e";
 }
-
-function getRiskScoreColor(score: number): string {
-  if (score >= 80) return "#f87171";
-  if (score >= 60) return "#fb923c";
-  if (score >= 40) return "#fbbf24";
-  return "#34d399";
+function getRiskScoreColor(score: number) {
+  if (score >= 80) return "#ef4444";
+  if (score >= 60) return "#f97316";
+  if (score >= 40) return "#f59e0b";
+  return "#22c55e";
 }
 
 // ─── Types & Filters ──────────────────────────────────────────────────────────
-
 type FilterKey = "all" | "high_risk" | "review" | "pending" | "settled";
-
 const FILTERS: { id: FilterKey; label: string; dot?: string }[] = [
   { id: "all",       label: "All" },
   { id: "high_risk", label: "High risk", dot: "#ef4444" },
@@ -320,7 +300,6 @@ const FILTERS: { id: FilterKey; label: string; dot?: string }[] = [
   { id: "pending",   label: "Pending",   dot: "#3b82f6" },
   { id: "settled",   label: "Settled",   dot: "#22c55e" },
 ];
-
 function matchesFilter(client: Client, filter: FilterKey): boolean {
   if (filter === "all") return true;
   if (filter === "settled")   return client.isFullyPaid;
@@ -330,8 +309,43 @@ function matchesFilter(client: Client, filter: FilterKey): boolean {
   return true;
 }
 
-// ─── AI Risk Panel ────────────────────────────────────────────────────────────
+// ─── SVG icon atoms — no emoji, no toy icons ────────────────────────────────
+function IconMoney() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+      <rect x="1" y="3" width="12" height="8" rx="2" stroke="currentColor" strokeWidth="1.2"/>
+      <circle cx="7" cy="7" r="1.5" stroke="currentColor" strokeWidth="1.2"/>
+      <path d="M4 7h.5M9.5 7H10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+    </svg>
+  );
+}
+function IconFlag() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+      <path d="M3 12V2.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+      <path d="M3 2.5h7.5l-2 3 2 3H3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+function IconUsers() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+      <circle cx="5" cy="4.5" r="2" stroke="currentColor" strokeWidth="1.2"/>
+      <path d="M1 11c0-2.21 1.79-4 4-4s4 1.79 4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+      <path d="M10 6.5c1.1 0 2 .9 2 2v2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+      <path d="M8 3.5a2 2 0 010 2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+    </svg>
+  );
+}
+function IconCheck() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+      <path d="M2.5 7.5l3 3 6-6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
 
+// ─── AI Risk Panel — light mode ───────────────────────────────────────────────
 interface AIRiskPanelProps {
   aiEnabled: boolean;
   onToggleAI: () => void;
@@ -345,332 +359,53 @@ interface AIRiskPanelProps {
   onOpenCustomer: (email: string) => void;
 }
 
-function AIRiskPanel({ aiEnabled, onToggleAI, loading, loadingAll, summary, onOpenCustomer }: AIRiskPanelProps) {
-  const { totals, totalAmountAtRisk, topRiskCustomers } = summary;
-  const total = totals?.all ?? 0;
-
-  const riskBreakdown = [
-    { label: "Critical", count: totals?.critical ?? 0, color: "#f87171", pct: total > 0 ? ((totals?.critical ?? 0) / total) * 100 : 0 },
-    { label: "High risk", count: totals?.high_risk ?? 0, color: "#fb923c", pct: total > 0 ? ((totals?.high_risk ?? 0) / total) * 100 : 0 },
-    { label: "Watch",    count: totals?.watch ?? 0,    color: "#fbbf24", pct: total > 0 ? ((totals?.watch ?? 0) / total) * 100 : 0 },
-    { label: "Healthy",  count: totals?.healthy ?? 0,  color: "#34d399", pct: total > 0 ? ((totals?.healthy ?? 0) / total) * 100 : 0 },
-  ];
-
-  return (
-    <div className="ai-panel ac-in" style={{ animationDelay: "0.04s" }}>
-      {/* Header */}
-      <div className="ai-panel-header">
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div className="ai-badge">
-            <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#38bdf8", flexShrink: 0 }}
-              className={loadingAll ? "ai-pulse" : ""} />
-            AI Risk Intelligence
-          </div>
-          <span style={{ fontSize: 12, color: "#475569", fontFamily: "var(--sans)", letterSpacing: "-0.01em" }}>
-            {loadingAll ? "Analysing accounts…" : `${topRiskCustomers.length} customers flagged`}
-          </span>
-        </div>
-        <button className={`ai-toggle${aiEnabled ? " active" : ""}`} onClick={onToggleAI}>
-          <span className="ai-toggle-dot" />
-          {aiEnabled ? "AI Analysis on" : "Enable AI Analysis"}
-        </button>
-      </div>
-
-      {/* Stats row */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)" }}>
-        {/* Amount at risk */}
-        <div className="ai-stat">
-          <div className="ai-stat-label">Amount at risk</div>
-          {loading ? (
-            <div className="ai-shimmer" style={{ height: 28, width: "75%", marginTop: 4 }} />
-          ) : (
-            <div className="ai-stat-value" style={{ color: totalAmountAtRisk > 0 ? "#f87171" : "#34d399" }}>
-             {fmtK(totalAmountAtRisk, "INR")}
-            </div>
-          )}
-          <div className="ai-stat-hint">open exposure</div>
-        </div>
-
-        {/* Critical */}
-        <div className="ai-stat">
-          <div className="ai-stat-label">Critical accounts</div>
-          {loading ? (
-            <div className="ai-shimmer" style={{ height: 28, width: "40%", marginTop: 4 }} />
-          ) : (
-            <div className="ai-stat-value" style={{ color: (totals?.critical ?? 0) > 0 ? "#f87171" : "#64748b" }}>
-              {totals?.critical ?? 0}
-            </div>
-          )}
-          <div className="ai-stat-hint">immediate action</div>
-          <div className="risk-bar-track">
-            <div className="risk-bar-fill" style={{
-              width: `${riskBreakdown[0].pct}%`,
-              background: "#f87171",
-            }} />
-          </div>
-        </div>
-
-        {/* High risk */}
-        <div className="ai-stat">
-          <div className="ai-stat-label">High risk</div>
-          {loading ? (
-            <div className="ai-shimmer" style={{ height: 28, width: "40%", marginTop: 4 }} />
-          ) : (
-            <div className="ai-stat-value" style={{ color: (totals?.high_risk ?? 0) > 0 ? "#fb923c" : "#64748b" }}>
-              {totals?.high_risk ?? 0}
-            </div>
-          )}
-          <div className="ai-stat-hint">needs review</div>
-          <div className="risk-bar-track">
-            <div className="risk-bar-fill" style={{
-              width: `${riskBreakdown[1].pct}%`,
-              background: "#fb923c",
-            }} />
-          </div>
-        </div>
-
-        {/* Healthy */}
-        <div className="ai-stat">
-          <div className="ai-stat-label">Healthy</div>
-          {loading ? (
-            <div className="ai-shimmer" style={{ height: 28, width: "40%", marginTop: 4 }} />
-          ) : (
-            <div className="ai-stat-value" style={{ color: "#34d399" }}>
-              {totals?.healthy ?? 0}
-            </div>
-          )}
-          <div className="ai-stat-hint">in good standing</div>
-          <div className="risk-bar-track">
-            <div className="risk-bar-fill" style={{
-              width: `${riskBreakdown[3].pct}%`,
-              background: "#34d399",
-            }} />
-          </div>
-        </div>
-      </div>
-
-      {/* Risk distribution bar */}
-      {!loading && total > 0 && (
-        <div style={{ padding: "12px 20px", borderTop: "1px solid #1e293b" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-            <span style={{ fontSize: 10, fontWeight: 600, color: "#475569", letterSpacing: "0.08em", textTransform: "uppercase", fontFamily: "var(--sans)" }}>
-              Risk distribution
-            </span>
-          </div>
-          <div style={{ display: "flex", gap: 2, height: 6, borderRadius: 99, overflow: "hidden" }}>
-            {riskBreakdown.filter(r => r.count > 0).map(r => (
-              <div key={r.label} title={`${r.label}: ${r.count}`} style={{
-                flex: r.count, background: r.color, transition: "flex 0.5s ease",
-              }} />
-            ))}
-          </div>
-          <div style={{ display: "flex", gap: 16, marginTop: 8 }}>
-            {riskBreakdown.map(r => (
-              <div key={r.label} style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: r.color, flexShrink: 0 }} />
-                <span style={{ fontSize: 11, color: "#475569", fontFamily: "var(--sans)", letterSpacing: "-0.01em" }}>
-                  {r.label} <span style={{ color: r.color, fontWeight: 500 }}>{r.count}</span>
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Top risk customers */}
-      {topRiskCustomers.length > 0 && (
-        <div style={{ borderTop: "1px solid #1e293b" }}>
-          <div style={{ padding: "12px 20px 8px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontSize: 10, fontWeight: 600, color: "#475569", letterSpacing: "0.08em", textTransform: "uppercase", fontFamily: "var(--sans)" }}>
-              Top risk accounts
-            </span>
-            {aiEnabled && (
-              <span style={{
-                fontSize: 10, fontWeight: 600, color: "#38bdf8",
-                background: "rgba(56,189,248,0.1)", border: "1px solid rgba(56,189,248,0.2)",
-                padding: "2px 8px", borderRadius: 99, letterSpacing: "0.05em",
-                textTransform: "uppercase", fontFamily: "var(--sans)",
-              }}>
-                AI scored
-              </span>
-            )}
-          </div>
-          {topRiskCustomers.slice(0, 5).map((c, i) => {
-            const scoreColor = getRiskScoreColor(c.riskScore ?? 0);
-            return (
-              <div key={c.email} className="ai-risk-row" onClick={() => onOpenCustomer(c.email)}>
-                <div className="ai-risk-rank">#{i + 1}</div>
-
-                {/* Avatar */}
-                <div style={{
-                  width: 28, height: 28, borderRadius: 7, flexShrink: 0,
-                  background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 9, fontWeight: 600, color: "#94a3b8",
-                  letterSpacing: "0.02em", fontFamily: "var(--sans)",
-                }}>
-                  {inits(c.name ?? "", c.email)}
-                </div>
-
-                {/* Name / email */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{
-                    fontSize: 12.5, fontWeight: 500, color: "#e2e8f0",
-                    letterSpacing: "-0.015em", lineHeight: 1.2,
-                    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                  }}>
-                    {c.name || c.email}
-                  </div>
-                  <div style={{
-                    fontSize: 10.5, color: "#475569", marginTop: 1,
-                    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                  }}>
-                    {c.name ? c.email : ""}
-                  </div>
-                </div>
-
-                {/* Amount due */}
-                {c.totalDue != null && (
-                  <div style={{
-                    fontSize: 12, fontWeight: 500, color: "#94a3b8",
-                    fontFamily: "var(--sans)", letterSpacing: "-0.01em", flexShrink: 0,
-                  }}>
-                   {fmtK(c.totalDue, "INR")}
-                  </div>
-                )}
-
-                {/* Risk level badge */}
-                <div style={{
-                  display: "flex", alignItems: "center", gap: 5,
-                  padding: "3px 8px", borderRadius: 5,
-                  background: `${getRiskColor(c.riskLevel ?? "")}14`,
-                  border: `1px solid ${getRiskColor(c.riskLevel ?? "")}30`,
-                  flexShrink: 0,
-                }}>
-                  <span style={{ width: 4, height: 4, borderRadius: "50%", background: getRiskColor(c.riskLevel ?? ""), flexShrink: 0 }} />
-                  <span style={{
-                    fontSize: 10, fontWeight: 600, color: getRiskColor(c.riskLevel ?? ""),
-                    textTransform: "capitalize", letterSpacing: "-0.01em", fontFamily: "var(--sans)",
-                  }}>
-                    {c.riskLevel?.replace("_", " ") ?? "—"}
-                  </span>
-                </div>
-
-                {/* Score bar (shown if AI enabled and score available) */}
-                {aiEnabled && c.riskScore != null && (
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0, width: 80 }}>
-                    <div className="ai-risk-score-bar">
-                      <div style={{
-                        height: "100%", borderRadius: 99,
-                        width: `${c.riskScore}%`,
-                        background: scoreColor,
-                        transition: "width 0.6s cubic-bezier(0.16,1,0.3,1)",
-                      }} />
-                    </div>
-                    <span style={{ fontSize: 10.5, fontWeight: 600, color: scoreColor, minWidth: 24, textAlign: "right", fontFamily: "var(--sans)" }}>
-                      {c.riskScore}
-                    </span>
-                  </div>
-                )}
-
-                {/* Arrow */}
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ flexShrink: 0, opacity: 0.3 }}>
-                  <path d="M2 8L8 2M8 2H4M8 2V6" stroke="#94a3b8" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Loading skeleton for top risk */}
-      {loadingAll && topRiskCustomers.length === 0 && (
-        <div style={{ borderTop: "1px solid #1e293b", padding: "12px 20px", display: "flex", flexDirection: "column", gap: 10 }}>
-          <div className="ai-shimmer" style={{ height: 10, width: "30%" }} />
-          {[0, 1, 2].map(i => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div className="ai-shimmer" style={{ width: 28, height: 28, borderRadius: 7, flexShrink: 0 }} />
-              <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 5 }}>
-                <div className="ai-shimmer" style={{ height: 10, width: "45%" }} />
-                <div className="ai-shimmer" style={{ height: 8, width: "65%" }} />
-              </div>
-              <div className="ai-shimmer" style={{ height: 20, width: 60, borderRadius: 5 }} />
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 // ─── Customer Card ────────────────────────────────────────────────────────────
-
 function CustomerCard({ client, delay, aiEnabled, riskScore }: {
-  client: Client;
-  delay: number;
-  aiEnabled: boolean;
-  riskScore?: number;
+  client: Client; delay: number; aiEnabled: boolean; riskScore?: number;
 }) {
   const dispatch = useDispatch<AppDispatch>();
   const risk = getRisk(client);
-  const initials = inits(client.name, client.email);
 
   return (
-    <div
-      className="ac-card ac-in"
-      style={{ animationDelay: `${delay}s` }}
-      onClick={() => dispatch(openCustomer(client.email))}
-    >
-      {/* Top: avatar + name + risk badge */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+    <div className="ac-card ac-in" style={{ animationDelay: `${delay}s` }} onClick={() => dispatch(openCustomer(client.email))}>
+      {/* Header row */}
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 9, minWidth: 0 }}>
           <div style={{
-            width: 34, height: 34, borderRadius: 9, flexShrink: 0,
+            width: 32, height: 32, borderRadius: 8, flexShrink: 0,
             background: "#f3f4f6", border: "1px solid #e5e7eb",
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 11, fontWeight: 600, color: "#374151",
-            letterSpacing: "0.02em", fontFamily: "var(--sans)",
+            fontSize: 10.5, fontWeight: 600, color: "#374151", letterSpacing: "0.02em",
           }}>
-            {initials}
+            {inits(client.name, client.email)}
           </div>
           <div style={{ minWidth: 0 }}>
-            <div style={{
-              fontSize: 13.5, fontWeight: 500, color: "#111827",
-              letterSpacing: "-0.015em", lineHeight: 1.2,
-              overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-            }}>
+            <div style={{ fontSize: 13, fontWeight: 500, color: "#111827", letterSpacing: "-0.015em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }}>
               {client.name || "—"}
             </div>
-            <div style={{
-              fontSize: 11, color: "#9ca3af", marginTop: 2,
-              overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-              letterSpacing: "-0.01em",
-            }}>
+            <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }}>
               {client.email}
             </div>
           </div>
         </div>
-
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, flexShrink: 0 }}>
           <span style={{
-            display: "inline-flex", alignItems: "center", gap: 5,
-            fontSize: 11, fontWeight: 500, flexShrink: 0,
-            padding: "3px 8px", borderRadius: 99,
+            display: "inline-flex", alignItems: "center", gap: 4,
+            fontSize: 10.5, fontWeight: 500, padding: "2px 7px", borderRadius: 5,
             background: risk.bg, color: risk.color, border: `1px solid ${risk.border}`,
-            letterSpacing: "-0.01em",
+            letterSpacing: "-0.01em", whiteSpace: "nowrap" as const,
           }}>
-            <span style={{ width: 5, height: 5, borderRadius: "50%", background: risk.dot, flexShrink: 0 }} />
+            <span style={{ width: 4, height: 4, borderRadius: "50%", background: risk.dot }} />
             {risk.label}
           </span>
-
-          {/* AI score chip */}
           {aiEnabled && riskScore != null && (
             <div className="ai-chip" style={{
-              background: `${getRiskScoreColor(riskScore)}12`,
-              border: `1px solid ${getRiskScoreColor(riskScore)}25`,
+              background: `${getRiskScoreColor(riskScore)}0f`,
+              border: `1px solid ${getRiskScoreColor(riskScore)}20`,
               color: getRiskScoreColor(riskScore),
             }}>
-              <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: "0.05em" }}>AI</span>
+              <span style={{ fontSize: 7.5, fontWeight: 700, letterSpacing: "0.06em" }}>AI</span>
               {riskScore}
             </div>
           )}
@@ -678,113 +413,102 @@ function CustomerCard({ client, delay, aiEnabled, riskScore }: {
       </div>
 
       {/* Divider */}
-      <div style={{ height: "1px", background: "#f3f4f6", margin: "0 -20px" }} />
+      <div style={{ height: 1, background: "#f3f4f6", margin: "0 -16px" }} />
 
-      {/* Stats row */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+      {/* Metrics */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         <div>
-          <div style={{
-            fontSize: 10, fontWeight: 600, color: "#9ca3af",
-            textTransform: "uppercase" as const, letterSpacing: "0.1em", marginBottom: 5,
-          }}>
+          <div style={{ fontSize: 9.5, fontWeight: 600, color: "#9ca3af", textTransform: "uppercase" as const, letterSpacing: "0.08em", marginBottom: 4 }}>
             Outstanding
           </div>
-          <div style={{
-            fontFamily: "var(--serif)",
-            fontSize: 22, fontWeight: 400, color: client.isFullyPaid ? "#16a34a" : "#111827",
-            letterSpacing: "-0.02em", lineHeight: 1,
-          }}>
-          {fmt(client.totalDue, (client as any).currency ?? "INR")}
+          <div style={{ fontFamily: "'Instrument Serif',Georgia,serif", fontSize: 20, fontWeight: 400, color: client.isFullyPaid ? "#16a34a" : "#111827", letterSpacing: "-0.02em", lineHeight: 1 }}>
+            {fmt(client.totalDue, (client as any).currency ?? "INR")}
           </div>
         </div>
         <div>
-          <div style={{
-            fontSize: 10, fontWeight: 600, color: "#9ca3af",
-            textTransform: "uppercase" as const, letterSpacing: "0.1em", marginBottom: 5,
-          }}>
+          <div style={{ fontSize: 9.5, fontWeight: 600, color: "#9ca3af", textTransform: "uppercase" as const, letterSpacing: "0.08em", marginBottom: 4 }}>
             Invoices
           </div>
-          <div style={{
-            fontFamily: "var(--serif)",
-            fontSize: 22, fontWeight: 400, color: "#111827",
-            letterSpacing: "-0.02em", lineHeight: 1,
-          }}>
+          <div style={{ fontFamily: "'Instrument Serif',Georgia,serif", fontSize: 20, fontWeight: 400, color: "#111827", letterSpacing: "-0.02em", lineHeight: 1 }}>
             {client.invoiceCount}
           </div>
         </div>
       </div>
 
-      {/* Lifecycle + CTA row */}
+      {/* Footer */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <span style={{
-          fontSize: 12, color: "#6b7280",
-          textTransform: "capitalize" as const, letterSpacing: "-0.01em",
-        }}>
+        <span style={{ fontSize: 11.5, color: "#9ca3af", textTransform: "capitalize" as const, letterSpacing: "-0.01em" }}>
           {client.lifecycle ?? "—"}
         </span>
-        <div
-          className="ac-card-arrow"
-          style={{
-            width: 26, height: 26, borderRadius: 7,
-            background: "#f3f4f6", border: "1px solid #e5e7eb",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            transition: "all 0.12s", flexShrink: 0,
-          }}
-        >
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-            <path d="M2 8L8 2M8 2H4M8 2V6" stroke="#9ca3af" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none" style={{ color: "#d1d5db", transition: "color 0.12s" }}>
+          <path d="M3 11L11 3M11 3H6M11 3v5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
       </div>
     </div>
   );
 }
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
-
 function SkeletonCard() {
   return (
-    <div style={{
-      background: "#fff", border: "1px solid #e5e7eb", borderRadius: 14,
-      padding: 20, display: "flex", flexDirection: "column", gap: 16,
-    }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <div className="ac-shimmer" style={{ width: 34, height: 34, borderRadius: 9, flexShrink: 0 }} />
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 6 }}>
-          <div className="ac-shimmer" style={{ height: 12, width: "55%" }} />
-          <div className="ac-shimmer" style={{ height: 10, width: "75%" }} />
+    <div style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12, padding: 16, display: "flex", flexDirection: "column", gap: 14 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+        <div className="ac-shimmer" style={{ width: 32, height: 32, borderRadius: 8, flexShrink: 0 }} />
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 5 }}>
+          <div className="ac-shimmer" style={{ height: 11, width: "50%" }} />
+          <div className="ac-shimmer" style={{ height: 9, width: "70%" }} />
         </div>
       </div>
       <div style={{ height: 1, background: "#f3f4f6" }} />
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-        <div className="ac-shimmer" style={{ height: 32 }} />
-        <div className="ac-shimmer" style={{ height: 32 }} />
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        <div className="ac-shimmer" style={{ height: 28 }} />
+        <div className="ac-shimmer" style={{ height: 28 }} />
       </div>
-      <div className="ac-shimmer" style={{ height: 12, width: "40%" }} />
+      <div className="ac-shimmer" style={{ height: 10, width: "35%" }} />
+    </div>
+  );
+}
+
+// ─── Stat Card ────────────────────────────────────────────────────────────────
+function StatCard({ label, value, hint, icon }: { label: string; value: string; hint: string; icon: React.ReactNode }) {
+  return (
+    <div style={{
+      border: "1px solid #e5e7eb", borderRadius: 10, padding: "16px 18px", background: "#fff",
+      transition: "border-color 0.12s",
+    }}
+      onMouseEnter={e => (e.currentTarget.style.borderColor = "#d1d5db")}
+      onMouseLeave={e => (e.currentTarget.style.borderColor = "#e5e7eb")}
+    >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+        <span style={{ fontSize: 10, fontWeight: 600, color: "#9ca3af", textTransform: "uppercase" as const, letterSpacing: "0.08em", fontFamily: "var(--sans)" }}>
+          {label}
+        </span>
+        <div style={{ width: 22, height: 22, borderRadius: 5, border: "1px solid #e5e7eb", background: "#f9fafb", display: "flex", alignItems: "center", justifyContent: "center", color: "#9ca3af" }}>
+          {icon}
+        </div>
+      </div>
+      <div style={{ fontFamily: "'Instrument Serif',Georgia,serif", fontSize: 28, fontWeight: 400, color: "#111827", lineHeight: 1, letterSpacing: "-0.02em" }}>
+        {value}
+      </div>
+      <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 4, fontFamily: "var(--sans)" }}>{hint}</div>
     </div>
   );
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
-
 export default function Activity() {
   const dispatch = useDispatch<AppDispatch>();
-
   const { list: clients, loading, error } = useSelector((s: RootState) => s.clients);
   const { all: riskAll, summary, loadingAll, loadingSummary } = useSelector((s: RootState) => s.risk);
 
-  const [search, setSearch]     = useState("");
-  const [focused, setFocused]   = useState(false);
-  const [filter, setFilter]     = useState<FilterKey>("all");
-  const [sort, setSort]         = useState<"due_desc" | "due_asc" | "name" | "invoices">("due_desc");
+  const [search, setSearch]       = useState("");
+  const [filter, setFilter]       = useState<FilterKey>("all");
+  const [sort, setSort]           = useState<"due_desc" | "due_asc" | "name" | "invoices">("due_desc");
   const [aiEnabled, setAIEnabled] = useState(false);
 
-  // Build a map of email → riskScore for quick lookup on cards
   const riskScoreMap = React.useMemo(() => {
     const m: Record<string, number> = {};
-    riskAll.forEach(r => {
-      if (r.email && r.riskScore != null) m[r.email] = r.riskScore;
-    });
+    riskAll.forEach(r => { if (r.email && r.riskScore != null) m[r.email] = r.riskScore; });
     return m;
   }, [riskAll]);
 
@@ -806,11 +530,7 @@ export default function Activity() {
 
   const filtered = clients
     .filter(c => matchesFilter(c, filter))
-    .filter(c =>
-      !search ||
-      c.name?.toLowerCase().includes(search.toLowerCase()) ||
-      c.email?.toLowerCase().includes(search.toLowerCase())
-    )
+    .filter(c => !search || c.name?.toLowerCase().includes(search.toLowerCase()) || c.email?.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => {
       if (sort === "due_desc")  return b.totalDue - a.totalDue;
       if (sort === "due_asc")   return a.totalDue - b.totalDue;
@@ -827,180 +547,75 @@ export default function Activity() {
     <div className="ac">
       <style>{css}</style>
 
-      <div className="ac-scroll" style={{ flex: 1, overflowY: "auto", padding: "36px 32px 64px" }}>
-
-        {/* Heading */}
-        <div className="ac-in" style={{ marginBottom: 24 }}>
-          <div style={{
-            fontSize: "10.5px", fontWeight: 600, letterSpacing: "0.1em",
-            color: "#9ca3af", textTransform: "uppercase" as const, marginBottom: 8,
-            fontFamily: "var(--sans)",
-          }}>
-            Customers
-          </div>
+      {/* Page header */}
+      <div style={{
+        background: "#fff", borderBottom: "1px solid #e5e7eb",
+        padding: "20px 28px 0", flexShrink: 0,
+      }}>
+        <div style={{ marginBottom: 16 }}>
           <h1 style={{
-            fontFamily: "'Instrument Serif', Georgia, serif",
-            fontSize: "clamp(28px, 3vw, 40px)",
-            fontWeight: 400, lineHeight: 1.1,
-            letterSpacing: "-0.025em", color: "#111827",
-            margin: "0 0 6px",
+            fontFamily: "'Instrument Serif',Georgia,serif",
+            fontSize: 26, fontWeight: 400, color: "#111827",
+            letterSpacing: "-0.025em", margin: "0 0 4px", lineHeight: 1.2,
           }}>
-            {clients.length} accounts. <em style={{ fontStyle: "italic" }}>Every signal tracked.</em>
+            Clients
           </h1>
-          <p style={{
-            fontSize: 13.5, color: "#6b7280", letterSpacing: "-0.01em",
-            margin: 0, fontFamily: "var(--sans)",
-          }}>
-            Filter, sort, and drill into any customer's full profile.
+          <p style={{ fontSize: 13, color: "#9ca3af", margin: 0, fontFamily: "var(--sans)", letterSpacing: "-0.01em" }}>
+            {clients.length > 0 ? `${clients.length} accounts · every signal tracked` : "Loading accounts…"}
           </p>
         </div>
+      </div>
 
-        {/* ── AI Risk Intelligence Panel ── */}
-        <AIRiskPanel
-          aiEnabled={aiEnabled}
-          onToggleAI={handleToggleAI}
-          loading={loadingSummary}
-          loadingAll={loadingAll}
-          summary={summary}
-          onOpenCustomer={handleOpenCustomer}
-        />
+      <div className="ac-scroll" style={{ flex: 1, overflowY: "auto", padding: "20px 28px 64px" }}>
+
 
         {/* Stat cards */}
         {!loading && clients.length > 0 && (
-          <div className="ac-in" style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: 10, marginBottom: 24,
-            animationDelay: "0.05s",
-          }}>
-            {[
-              { label: "Outstanding",  val: fmtK(totalDue, "INR"),         hint: `${clients.length} clients`,  icon: "$" },
-              { label: "High Risk",     val: String(highRiskCount),   hint: "need attention",             icon: "⚠" },
-              { label: "Total Clients", val: String(clients.length),  hint: "tracked accounts",           icon: "◫" },
-              { label: "Paid Invoices", val: String(settledCount),    hint: "across all clients",         icon: "✓" },
-            ].map(({ label, val, hint, icon }) => (
-              <div key={label} style={{
-                border: "1px solid #e5e7eb", borderRadius: 12,
-                padding: "18px 20px", background: "#fff",
-                transition: "border-color 0.15s",
-              }}
-                onMouseEnter={e => (e.currentTarget.style.borderColor = "#d1d5db")}
-                onMouseLeave={e => (e.currentTarget.style.borderColor = "#e5e7eb")}
-              >
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-                  <span style={{
-                    fontSize: 10, fontWeight: 600, color: "#9ca3af",
-                    textTransform: "uppercase" as const, letterSpacing: "0.1em",
-                    fontFamily: "var(--sans)",
-                  }}>{label}</span>
-                  <div style={{
-                    width: 24, height: 24, borderRadius: 6,
-                    border: "1px solid #e5e7eb", background: "#f9fafb",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 10, color: "#6b7280",
-                  }}>{icon}</div>
-                </div>
-                <div style={{
-                  fontFamily: "'Instrument Serif', Georgia, serif",
-                  fontSize: 32, fontWeight: 400, color: "#111827",
-                  margin: 0, lineHeight: 1, letterSpacing: "-0.02em",
-                }}>{val}</div>
-                <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 5, fontFamily: "var(--sans)" }}>{hint}</div>
-              </div>
-            ))}
+          <div className="ac-in" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 20, animationDelay: "0.05s" }}>
+            <StatCard label="Outstanding"    value={fmtK(totalDue, "INR")}        hint={`${clients.length} clients`}    icon={<IconMoney />} />
+            <StatCard label="High risk"      value={String(highRiskCount)}         hint="need attention"                 icon={<IconFlag />} />
+            <StatCard label="Total clients"  value={String(clients.length)}        hint="tracked accounts"               icon={<IconUsers />} />
+            <StatCard label="Paid invoices"  value={String(settledCount)}          hint="across all clients"             icon={<IconCheck />} />
           </div>
         )}
 
         {/* Toolbar */}
         {!loading && clients.length > 0 && (
-          <div className="ac-in" style={{
-            display: "flex", alignItems: "center",
-            justifyContent: "space-between", flexWrap: "wrap" as const,
-            gap: 10, marginBottom: 20, animationDelay: "0.1s",
-          }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" as const }}>
-              {/* Search */}
-              <div style={{
-                display: "flex", alignItems: "center", gap: 7,
-                border: `1px solid ${focused ? "#9ca3af" : "#e5e7eb"}`,
-                borderRadius: 8, padding: "6px 12px", background: "#fff",
-                transition: "all 0.15s",
-                boxShadow: focused ? "0 0 0 3px rgba(0,0,0,0.04)" : "none",
-              }}>
-                <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                  <circle cx="5.5" cy="5.5" r="4" stroke="#9ca3af" strokeWidth="1.2" />
-                  <path d="M9 9L11.5 11.5" stroke="#9ca3af" strokeWidth="1.2" strokeLinecap="round" />
+          <div className="ac-in" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap" as const, gap: 8, marginBottom: 16, animationDelay: "0.08s" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" as const }}>
+              <div className="ac-search-wrap">
+                <svg width="12" height="12" viewBox="0 0 13 13" fill="none" style={{ flexShrink: 0, color: "#9ca3af" }}>
+                  <circle cx="5.5" cy="5.5" r="4" stroke="currentColor" strokeWidth="1.2" />
+                  <path d="M9 9L11.5 11.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
                 </svg>
-                <input
-                  className="ac-search-input"
-                  placeholder="Search clients…"
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  onFocus={() => setFocused(true)}
-                  onBlur={() => setFocused(false)}
-                />
+                <input className="ac-search-input" placeholder="Search…" value={search} onChange={e => setSearch(e.target.value)} />
                 {search && (
-                  <button onClick={() => setSearch("")} style={{
-                    border: "none", background: "none", cursor: "pointer",
-                    color: "#9ca3af", padding: 0, fontSize: 14, lineHeight: 1,
-                  }}>×</button>
+                  <button onClick={() => setSearch("")} style={{ border: "none", background: "none", cursor: "pointer", color: "#9ca3af", padding: 0, lineHeight: 1, fontSize: 14 }}>×</button>
                 )}
               </div>
-
-              {/* Filter pills */}
               {FILTERS.map(f => {
-                const count = f.id === "all"
-                  ? clients.length
-                  : clients.filter(c => matchesFilter(c, f.id)).length;
-                const isActive = filter === f.id;
+                const count = f.id === "all" ? clients.length : clients.filter(c => matchesFilter(c, f.id)).length;
                 return (
-                  <button
-                    key={f.id}
-                    className={`ac-filter${isActive ? " active" : ""}`}
-                    onClick={() => setFilter(f.id)}
-                  >
+                  <button key={f.id} className={`ac-filter-pill${filter === f.id ? " active" : ""}`} onClick={() => setFilter(f.id)}>
                     {f.dot && (
-                      <span style={{
-                        width: 5, height: 5, borderRadius: "50%",
-                        background: isActive ? "rgba(255,255,255,0.6)" : f.dot,
-                        flexShrink: 0,
-                      }} />
+                      <span style={{ width: 5, height: 5, borderRadius: "50%", background: filter === f.id ? "rgba(255,255,255,0.6)" : f.dot, flexShrink: 0 }} />
                     )}
                     {f.label}
-                    <span style={{
-                      fontSize: 10.5, fontWeight: 500,
-                      padding: "1px 6px", borderRadius: 99,
-                      background: isActive ? "rgba(255,255,255,0.15)" : "#f3f4f6",
-                      border: `1px solid ${isActive ? "rgba(255,255,255,0.2)" : "#e5e7eb"}`,
-                      color: isActive ? "#fff" : "#9ca3af",
-                    }}>
-                      {count}
-                    </span>
+                    <span className="pill-count">{count}</span>
                   </button>
                 );
               })}
             </div>
-
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <select
-                className="ac-select"
-                value={sort}
-                onChange={e => setSort(e.target.value as typeof sort)}
-              >
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <select className="ac-select" value={sort} onChange={e => setSort(e.target.value as typeof sort)}>
                 <option value="due_desc">Highest due</option>
                 <option value="due_asc">Lowest due</option>
                 <option value="name">Name A–Z</option>
                 <option value="invoices">Most invoices</option>
               </select>
-
-              <button className="ac-refresh" onClick={() => {
-                dispatch(loadClients());
-                dispatch(loadRiskSummary());
-                dispatch(loadRiskAll(aiEnabled));
-              }}>
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                  <path d="M1 6C1 3.24 3.24 1 6 1c1.5 0 2.85.6 3.84 1.57M11 6c0 2.76-2.24 5-5 5-1.5 0-2.85-.6-3.84-1.57"
-                    stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+              <button className="ac-ghost-btn" onClick={() => { dispatch(loadClients()); dispatch(loadRiskSummary()); dispatch(loadRiskAll(aiEnabled)); }}>
+                <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                  <path d="M1 6C1 3.24 3.24 1 6 1c1.5 0 2.85.6 3.84 1.57M11 6c0 2.76-2.24 5-5 5-1.5 0-2.85-.6-3.84-1.57" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
                   <path d="M9.5 2l.84-.57.93.57" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
                 Refresh
@@ -1009,90 +624,52 @@ export default function Activity() {
           </div>
         )}
 
-        {/* Card wrapper */}
-        <div style={{
-          border: "1px solid #e5e7eb", borderRadius: 14,
-          overflow: "hidden", background: "#fff",
-        }}>
+        {/* Card grid */}
+        <div style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12, overflow: "hidden" }}>
           {!loading && clients.length > 0 && (
-            <div style={{
-              display: "flex", alignItems: "center", justifyContent: "space-between",
-              padding: "13px 20px", borderBottom: "1px solid #e5e7eb",
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{
-                  fontSize: 13, fontWeight: 600, color: "#111827",
-                  letterSpacing: "-0.02em", fontFamily: "var(--sans)",
-                }}>
-                  Client Accounts
-                </span>
-                <span style={{
-                  fontSize: 11, fontWeight: 500, color: "#6b7280",
-                  background: "#f3f4f6", border: "1px solid #e5e7eb",
-                  padding: "1px 8px", borderRadius: 100,
-                }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 16px", borderBottom: "1px solid #f3f4f6" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                <span style={{ fontSize: 12.5, fontWeight: 600, color: "#111827", letterSpacing: "-0.02em" }}>Client accounts</span>
+                <span style={{ fontSize: 10.5, fontWeight: 500, color: "#6b7280", background: "#f3f4f6", border: "1px solid #e5e7eb", padding: "1px 7px", borderRadius: 4 }}>
                   {filtered.length}
                 </span>
                 {aiEnabled && (
-                  <span style={{
-                    fontSize: 10, fontWeight: 600, color: "#38bdf8",
-                    background: "rgba(56,189,248,0.08)", border: "1px solid rgba(56,189,248,0.18)",
-                    padding: "2px 8px", borderRadius: 99, letterSpacing: "0.04em",
-                    textTransform: "uppercase" as const, fontFamily: "var(--sans)",
-                  }}>
+                  <span style={{ fontSize: 10, fontWeight: 600, color: "#1d4ed8", background: "#eff6ff", border: "1px solid #bfdbfe", padding: "1px 7px", borderRadius: 4, letterSpacing: "0.04em", textTransform: "uppercase" as const }}>
                     AI scored
                   </span>
                 )}
               </div>
-              <span style={{
-                fontSize: 11.5, color: "#9ca3af", letterSpacing: "-0.01em",
-                fontFamily: "var(--sans)",
-              }}>
-                Click any card to open profile →
+              <span style={{ fontSize: 11.5, color: "#9ca3af", letterSpacing: "-0.01em" }}>
+                Click any card to open profile
               </span>
             </div>
           )}
 
           {loading && (
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-              gap: 12, padding: 20,
-            }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 10, padding: 16 }}>
               {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
             </div>
           )}
 
           {error && !loading && (
-            <div style={{
-              margin: "12px 20px", padding: "10px 14px", borderRadius: 8,
-              background: "#fff8f8", border: "1px solid #fee2e2",
-              fontSize: 13, color: "#b91c1c", fontFamily: "var(--sans)",
-            }}>
+            <div style={{ margin: "12px 16px", padding: "10px 14px", borderRadius: 7, background: "#fef2f2", border: "1px solid #fecaca", fontSize: 13, color: "#b91c1c" }}>
               {error}
             </div>
           )}
 
           {!loading && !error && filtered.length === 0 && (
-            <div style={{
-              padding: "60px 20px", textAlign: "center",
-              fontSize: 13, color: "#9ca3af", fontFamily: "var(--sans)",
-            }}>
+            <div style={{ padding: "60px 16px", textAlign: "center", fontSize: 13, color: "#9ca3af" }}>
               {search ? `No clients matching "${search}"` : "No clients yet"}
             </div>
           )}
 
           {!loading && !error && filtered.length > 0 && (
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-              gap: 12, padding: 20,
-            }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 10, padding: 16 }}>
               {filtered.map((client, i) => (
                 <CustomerCard
                   key={client.id}
                   client={client}
-                  delay={Math.min(i * 0.03, 0.3)}
+                  delay={Math.min(i * 0.025, 0.25)}
                   aiEnabled={aiEnabled}
                   riskScore={riskScoreMap[client.email]}
                 />
@@ -1102,10 +679,7 @@ export default function Activity() {
         </div>
 
         {!loading && filtered.length > 0 && filtered.length < clients.length && (
-          <p style={{
-            fontSize: 12, color: "#9ca3af", textAlign: "center",
-            marginTop: 16, fontFamily: "var(--sans)",
-          }}>
+          <p style={{ fontSize: 12, color: "#9ca3af", textAlign: "center", marginTop: 14 }}>
             Showing {filtered.length} of {clients.length} clients
           </p>
         )}

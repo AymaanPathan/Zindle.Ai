@@ -1,5 +1,5 @@
 import React from "react";
-import TopNav from "./TopNav";
+import Sidebar from "./Sidebar";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -9,15 +9,15 @@ export default function AppShell({ children }: AppShellProps) {
   return (
     <div style={{
       display: "flex",
-      flexDirection: "column",
+      flexDirection: "row",
       height: "100vh",
       width: "100vw",
       overflow: "hidden",
-      backgroundColor: "#ffffff",
+      backgroundColor: "#fafafa",
       fontFamily: "'Geist', system-ui, sans-serif",
     }}>
-      <TopNav />
-      <div style={{ flex: 1, overflow: "auto" }}>
+      <Sidebar />
+      <div style={{ flex: 1, overflow: "auto", minWidth: 0 }}>
         {children}
       </div>
     </div>

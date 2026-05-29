@@ -5,72 +5,20 @@ import { setTab } from "../store/slices/uiSlice";
 
 type Tab = "clients" | "activity" | "chat";
 
-const NAV: { id: Tab; label: string; badge?: string; badgeWarm?: boolean; icon: React.ReactNode }[] = [
-  {
-    id: "clients",
-    label: "Clients",
-    badge: "24",
-    icon: (
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-        <rect x="1" y="1.5" width="12" height="11" rx="2.5" stroke="currentColor" strokeWidth="1.2"/>
-        <path d="M1 5.5h12" stroke="currentColor" strokeWidth="1.2"/>
-        <path d="M4.5 1.5v4M9.5 1.5v4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-      </svg>
-    ),
-  },
-  {
-    id: "activity",
-    label: "Activity",
-    badge: "3",
-    badgeWarm: true,
-    icon: (
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-        <path d="M1 7h2.5l2-4 2.5 8 2-4H13" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-      </svg>
-    ),
-  },
-  {
-    id: "chat",
-    label: "Ask AI",
-    icon: (
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-        <path d="M1.5 2.5h11c.28 0 .5.22.5.5v6c0 .28-.22.5-.5.5H8L5.5 12V9.5H2c-.28 0-.5-.22-.5-.5V3c0-.28.22-.5.5-.5z"
-          stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-      </svg>
-    ),
-  },
+const NAV: { id: Tab; label: string; badge?: string; badgeWarm?: boolean }[] = [
+  { id: "clients",  label: "Clients",  badge: "24" },
+  { id: "activity", label: "Activity", badge: "3", badgeWarm: true },
+  { id: "chat",     label: "Ask AI" },
 ];
 
 const QUICK = [
-  {
-    label: "New invoice",
-    icon: (
-      <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-        <path d="M7 1.5v11M1.5 7h11" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-      </svg>
-    ),
-  },
-  {
-    label: "Reports",
-    icon: (
-      <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-        <path d="M2 4.5h10M2 7.5h7M2 10.5h5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-      </svg>
-    ),
-  },
-  {
-    label: "History",
-    icon: (
-      <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-        <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.2"/>
-        <path d="M7 4.5v3l2 1.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-      </svg>
-    ),
-  },
+  { label: "New invoice" },
+  { label: "Reports" },
+  { label: "History" },
 ];
 
 const css = `
-  @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap');
 
   .sb {
     --g50:  #f9fafb;
@@ -81,70 +29,150 @@ const css = `
     --g500: #6b7280;
     --g600: #4b5563;
     --g700: #374151;
+    --g800: #1f2937;
     --g900: #111827;
-    --serif: 'Instrument Serif', Georgia, serif;
-    --sans:  'Geist', -apple-system, system-ui, sans-serif;
+    --accent: #18181b;
+    --sans: 'Geist', -apple-system, system-ui, sans-serif;
     font-family: var(--sans);
     -webkit-font-smoothing: antialiased;
   }
 
   .sb-nav-btn {
-    display: flex; align-items: center; gap: 8px;
-    width: 100%; padding: 6px 10px; border-radius: 8px;
-    border: none; background: transparent; cursor: pointer;
-    font-size: 13px; font-weight: 400; text-align: left;
-    letter-spacing: -0.01em; transition: all 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 5px 8px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 400;
+    text-align: left;
+    letter-spacing: -0.01em;
+    transition: background 0.1s, color 0.1s;
     font-family: var(--sans);
+    color: var(--g500);
+    line-height: 1.4;
+    gap: 8px;
   }
   .sb-nav-btn:hover:not(.active) {
-    background: var(--g50);
-    color: var(--g900) !important;
+    background: var(--g100);
+    color: var(--g900);
   }
-  .sb-nav-btn:hover:not(.active) .sb-icon {
-    color: var(--g700) !important;
+  .sb-nav-btn.active {
+    background: var(--g100);
+    color: var(--g900);
+    font-weight: 500;
+  }
+
+  .sb-nav-left {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
   }
 
   .sb-quick-btn {
-    display: flex; align-items: center; gap: 8px;
-    width: 100%; padding: 5px 10px; border-radius: 8px;
-    border: none; background: transparent; cursor: pointer;
-    font-size: 12.5px; font-weight: 400; text-align: left;
-    letter-spacing: -0.01em; transition: all 0.1s;
-    font-family: var(--sans); color: var(--g400);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    width: 100%;
+    padding: 5px 8px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 12.5px;
+    font-weight: 400;
+    text-align: left;
+    letter-spacing: -0.01em;
+    transition: background 0.1s, color 0.1s;
+    font-family: var(--sans);
+    color: var(--g400);
   }
   .sb-quick-btn:hover {
-    background: var(--g50);
+    background: var(--g100);
     color: var(--g700);
   }
 
   .sb-badge {
-    margin-left: auto; flex-shrink: 0;
-    font-size: 10px; font-weight: 600; line-height: 16px;
-    padding: 1px 6px; border-radius: 100px;
-    background: var(--g900); color: #fff;
+    flex-shrink: 0;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--g200);
+    color: var(--g600);
+    letter-spacing: 0;
+    font-family: var(--sans);
   }
   .sb-badge-warm {
-    background: #fef3c7; color: #92400e;
+    background: #fef3c7;
+    color: #b45309;
   }
 
-  .sb-upgrade {
-    margin: 0 2px 2px; padding: 9px 10px; border-radius: 9px;
-    background: var(--g50); border: 1px solid var(--g200);
-    cursor: pointer; transition: all 0.12s;
+  .sb-section-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--g400);
+    letter-spacing: 0.01em;
+    padding: 0 8px;
+    margin-bottom: 2px;
+    font-family: var(--sans);
   }
-  .sb-upgrade:hover { border-color: var(--g300); background: #fff; }
 
-  .sb-user {
-    display: flex; align-items: center; gap: 8px;
-    padding: 6px 8px; border-radius: 8px; cursor: pointer;
+  .sb-user-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
     transition: background 0.1s;
+    width: 100%;
+    border: none;
+    background: transparent;
+    text-align: left;
   }
-  .sb-user:hover { background: var(--g50); }
+  .sb-user-row:hover {
+    background: var(--g100);
+  }
 
-  .sb-divider {
-    height: 1px; background: var(--g100); margin: 0 10px;
+  .sb-upgrade-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 7px 8px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-family: var(--sans);
+    transition: background 0.1s;
+    text-align: left;
+  }
+  .sb-upgrade-btn:hover {
+    background: var(--g100);
   }
 `;
+
+// Minimal dot icon — just a subtle square glyph, like Linear
+function NavDot({ active }: { active: boolean }) {
+  return (
+    <div style={{
+      width: 6,
+      height: 6,
+      borderRadius: 2,
+      background: active ? "#18181b" : "#d1d5db",
+      flexShrink: 0,
+      transition: "background 0.15s",
+    }} />
+  );
+}
 
 export default function Sidebar() {
   const dispatch   = useDispatch<AppDispatch>();
@@ -153,146 +181,232 @@ export default function Sidebar() {
 
   return (
     <aside className="sb" style={{
-      width: 200, flexShrink: 0,
+      width: 220,
+      flexShrink: 0,
+      height: "100vh",
       background: "#ffffff",
       borderRight: "1px solid #e5e7eb",
-      display: "flex", flexDirection: "column",
+      display: "flex",
+      flexDirection: "column",
+      userSelect: "none",
     }}>
       <style>{css}</style>
 
       {/* ── Brand ── */}
       <div style={{
-        height: 52, display: "flex", alignItems: "center",
-        padding: "0 16px", borderBottom: "1px solid #e5e7eb",
-        gap: 9, flexShrink: 0,
+        height: 48,
+        display: "flex",
+        alignItems: "center",
+        padding: "0 16px",
+        flexShrink: 0,
+        gap: 8,
       }}>
+        {/* Wordmark-style logo — clean, no toy icon */}
         <div style={{
-          width: 22, height: 22, borderRadius: 6,
-          background: "#111827",
-          display: "flex", alignItems: "center", justifyContent: "center",
+          width: 20,
+          height: 20,
+          borderRadius: 5,
+          background: "#18181b",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           flexShrink: 0,
         }}>
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M2 9.5L6 2.5L10 9.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-            <circle cx="6" cy="6.5" r="1.2" fill="white"/>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <rect x="1.5" y="1.5" width="3" height="7" rx="1" fill="white" opacity="0.9"/>
+            <rect x="5.5" y="3.5" width="3" height="5" rx="1" fill="white" opacity="0.55"/>
           </svg>
         </div>
         <span style={{
-          fontSize: 14, fontWeight: 600, color: "#111827",
-          letterSpacing: "-0.03em", fontFamily: "var(--sans)",
+          fontSize: 13.5,
+          fontWeight: 600,
+          color: "#18181b",
+          letterSpacing: "-0.03em",
+          fontFamily: "var(--sans)",
         }}>inPay</span>
+
+        {/* Workspace badge */}
+        <span style={{
+          marginLeft: "auto",
+          fontSize: 10.5,
+          fontWeight: 500,
+          color: "#9ca3af",
+          background: "#f3f4f6",
+          border: "1px solid #e5e7eb",
+          borderRadius: 4,
+          padding: "1px 6px",
+          letterSpacing: "-0.01em",
+          fontFamily: "var(--sans)",
+        }}>Acme</span>
       </div>
 
       {/* ── Body ── */}
-      <div style={{ padding: "16px 8px 0", flex: 1, display: "flex", flexDirection: "column", gap: 20, overflowY: "auto" }}>
+      <div style={{
+        flex: 1,
+        overflowY: "auto",
+        padding: "8px 10px",
+        display: "flex",
+        flexDirection: "column",
+        gap: 24,
+      }}>
 
-        {/* Workspace nav */}
-        <div>
-          <div style={{
-            fontSize: "9.5px", fontWeight: 600, color: "#9ca3af",
-            textTransform: "uppercase", letterSpacing: "0.1em",
-            padding: "0 10px", marginBottom: 4,
-          }}>
-            Workspace
-          </div>
-
-          <nav style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-            {NAV.map((item) => {
-              const isActive = activeTab === item.id && activeView === "dashboard";
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => dispatch(setTab(item.id))}
-                  className={`sb-nav-btn${isActive ? " active" : ""}`}
-                  style={{
-                    color: isActive ? "#111827" : "#6b7280",
-                    fontWeight: isActive ? 500 : 400,
-                    background: isActive ? "#f3f4f6" : "transparent",
-                  }}
-                >
-                  <span className="sb-icon" style={{ color: isActive ? "#111827" : "#9ca3af", display: "flex" }}>
-                    {item.icon}
+        {/* Main nav */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+          {NAV.map((item) => {
+            const isActive = activeTab === item.id && activeView === "dashboard";
+            return (
+              <button
+                key={item.id}
+                onClick={() => dispatch(setTab(item.id))}
+                className={`sb-nav-btn${isActive ? " active" : ""}`}
+              >
+                <div className="sb-nav-left">
+                  <NavDot active={isActive} />
+                  <span>{item.label}</span>
+                </div>
+                {item.badge && (
+                  <span className={`sb-badge${item.badgeWarm ? " sb-badge-warm" : ""}`}>
+                    {item.badge}
                   </span>
-                  {item.label}
-                  {item.badge && (
-                    <span className={`sb-badge${item.badgeWarm ? " sb-badge-warm" : ""}`}>
-                      {item.badge}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </nav>
+                )}
+              </button>
+            );
+          })}
         </div>
 
-        <div className="sb-divider" />
+        {/* Divider */}
+        <div style={{ height: 1, background: "#f3f4f6", margin: "0 -2px" }} />
 
         {/* Quick links */}
         <div>
-          <div style={{
-            fontSize: "9.5px", fontWeight: 600, color: "#9ca3af",
-            textTransform: "uppercase", letterSpacing: "0.1em",
-            padding: "0 10px", marginBottom: 4,
-          }}>
-            Quick links
-          </div>
+          <div className="sb-section-label" style={{ marginBottom: 4 }}>Quick links</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
             {QUICK.map((item) => (
               <button key={item.label} className="sb-quick-btn">
-                <span style={{ display: "flex", color: "#9ca3af" }}>{item.icon}</span>
+                <div style={{
+                  width: 5,
+                  height: 5,
+                  borderRadius: 1.5,
+                  background: "#e5e7eb",
+                  flexShrink: 0,
+                }} />
                 {item.label}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Journey indicator */}
+        {/* Viewing indicator */}
         {activeView === "customer" && (
-          <div style={{ padding: "0 2px" }}>
+          <div style={{
+            padding: "8px 10px",
+            borderRadius: 8,
+            background: "#f9fafb",
+            border: "1px solid #e5e7eb",
+          }}>
             <div style={{
-              padding: "8px 10px", borderRadius: 9,
-              background: "#f9fafb", border: "1px solid #e5e7eb",
+              fontSize: 10,
+              fontWeight: 600,
+              color: "#9ca3af",
+              textTransform: "uppercase",
+              letterSpacing: "0.06em",
+              marginBottom: 2,
+              fontFamily: "var(--sans)",
             }}>
-              <div style={{
-                fontSize: "9.5px", fontWeight: 600, color: "#9ca3af",
-                textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 2,
-              }}>Viewing</div>
-              <div style={{ fontSize: 12.5, fontWeight: 600, color: "#111827", letterSpacing: "-0.01em" }}>
-                Payment Journey
-              </div>
+              Viewing
+            </div>
+            <div style={{
+              fontSize: 12.5,
+              fontWeight: 500,
+              color: "#111827",
+              letterSpacing: "-0.01em",
+              fontFamily: "var(--sans)",
+            }}>
+              Customer profile
             </div>
           </div>
         )}
       </div>
 
       {/* ── Footer ── */}
-      <div style={{ padding: "10px 8px 12px", borderTop: "1px solid #e5e7eb", display: "flex", flexDirection: "column", gap: 6 }}>
-        {/* Upgrade prompt */}
-        <div className="sb-upgrade">
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 2 }}>
-            <span style={{ fontSize: "9.5px", fontWeight: 600, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.08em" }}>Plan</span>
-            <span style={{ fontSize: 11, color: "#9ca3af" }}>↗</span>
+      <div style={{
+        padding: "8px 10px 12px",
+        borderTop: "1px solid #f3f4f6",
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+      }}>
+        {/* Upgrade */}
+        <button className="sb-upgrade-btn">
+          <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            <span style={{
+              fontSize: 12.5,
+              fontWeight: 500,
+              color: "#374151",
+              letterSpacing: "-0.015em",
+              fontFamily: "var(--sans)",
+            }}>
+              Upgrade to Pro
+            </span>
+            <span style={{
+              fontSize: 11,
+              color: "#9ca3af",
+              fontFamily: "var(--sans)",
+            }}>
+              Unlock all features
+            </span>
           </div>
-          <div style={{ fontSize: 12, fontWeight: 500, color: "#374151", letterSpacing: "-0.01em" }}>Upgrade to Pro</div>
-        </div>
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none" style={{ color: "#9ca3af", flexShrink: 0 }}>
+            <path d="M3 11L11 3M11 3H6M11 3v5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
 
         {/* User */}
-        <div className="sb-user">
+        <button className="sb-user-row">
           <div style={{
-            width: 26, height: 26, borderRadius: "50%",
-            background: "#111827", flexShrink: 0,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 10, fontWeight: 700, color: "#fff",
-          }}>A</div>
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 12.5, fontWeight: 500, color: "#111827", letterSpacing: "-0.01em", lineHeight: 1.2 }}>
+            width: 24,
+            height: 24,
+            borderRadius: 6,
+            background: "#18181b",
+            flexShrink: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 9.5,
+            fontWeight: 700,
+            color: "#fff",
+            letterSpacing: "0.02em",
+            fontFamily: "var(--sans)",
+          }}>
+            A
+          </div>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div style={{
+              fontSize: 12.5,
+              fontWeight: 500,
+              color: "#18181b",
+              letterSpacing: "-0.015em",
+              lineHeight: 1.3,
+              fontFamily: "var(--sans)",
+            }}>
               Admin
             </div>
-            <div style={{ fontSize: 11, color: "#9ca3af", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            <div style={{
+              fontSize: 11,
+              color: "#9ca3af",
+              lineHeight: 1.3,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              fontFamily: "var(--sans)",
+            }}>
               admin@acme.io
             </div>
           </div>
-        </div>
+          <svg width="11" height="11" viewBox="0 0 14 14" fill="none" style={{ color: "#d1d5db", flexShrink: 0 }}>
+            <path d="M3 5l4 4 4-4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
       </div>
     </aside>
   );
