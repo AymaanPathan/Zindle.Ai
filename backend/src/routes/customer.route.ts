@@ -412,213 +412,204 @@
    * Returns:
    *   { success: true, subject: string, body: string, type: string }
    */
-  router.post(
-    "/customers/:email/draft-email",
-    async (req: Request, res: Response) => {
-      const email = decodeURIComponent(req.params.email).trim();
-      const {
-        type = "payment_reminder",
-        customInstruction,
-      } = req.body as {
-        type?: string;
-        customInstruction?: string;
+ router.post(
+  "/customers/:email/draft-email",
+  async (req: Request, res: Response) => {
+    const email = decodeURIComponent(req.params.email).trim();
+    const {
+      type = "payment_reminder",
+      customInstruction,
+    } = req.body as {
+      type?: string;
+      customInstruction?: string;
+    };
+
+    console.log(`\n[draft-email] ${email} — type=${type}`);
+
+    try {
+      const [rows, emailEvents] = await Promise.all([
+        coralSql(`
+          SELECT
+            h.id AS hubspot_id, h.firstname, h.lastname, h.email,
+            h.company, h.lifecyclestage, h.createdate,
+            s.id AS invoice_id, s.number, s.status,
+            s.amount_due, s.amount_paid,
+            (s.amount_due - s.amount_paid) AS amount_remaining,
+            s.created, s.due_date, s.status_transitions__paid_at,
+            s.hosted_invoice_url, s.invoice_pdf, s.currency
+          FROM hubspot.contacts h
+          LEFT JOIN stripe.invoices s
+            ON LOWER(s.customer_email) = LOWER(h.email)
+          WHERE LOWER(h.email) = LOWER('${email.replace(/'/g, "''")}')
+          ORDER BY s.created DESC
+        `),
+        fetchEmailEvents(email),
+      ]);
+
+      const contact = rows.length ? {
+        id: rows[0].hubspot_id, firstname: rows[0].firstname,
+        lastname: rows[0].lastname, email: rows[0].email,
+        company: rows[0].company, lifecyclestage: rows[0].lifecyclestage,
+        createdate: rows[0].createdate,
+      } : null;
+
+      const invoices = rows
+        .filter(r => r.invoice_id != null)
+        .map(r => ({
+          id: r.invoice_id, number: r.number, status: r.status,
+          amount_due: r.amount_due, amount_paid: r.amount_paid,
+          amount_remaining: r.amount_remaining, created: r.created,
+          due_date: r.due_date, status_transitions__paid_at: r.status_transitions__paid_at,
+          hosted_invoice_url: r.hosted_invoice_url, invoice_pdf: r.invoice_pdf,
+        }));
+
+      const accountContext = buildAccountContext(email, contact, invoices, emailEvents);
+
+      const typeInstructions: Record<string, string> = {
+        payment_reminder:
+          "Write a short, warm reminder that there's an outstanding balance on the account. " +
+          "Do NOT mention specific amounts, invoice numbers, or any links. " +
+          "Just let them know it's pending and ask them to take care of it. 2 paragraphs max.",
+
+        overdue_followup:
+          "Write a firm but personal follow-up. The payment is overdue. " +
+          "Mention you haven't heard back and need this resolved soon. " +
+          "No links, no invoice numbers, no raw amounts. 1–2 short paragraphs only.",
+
+        relationship_checkin:
+          "Write a friendly check-in email. Ask how things are going with their business. " +
+          "Casually mention there's still an outstanding balance at the end and offer to discuss. " +
+          "Sound like a real person, not a collections system.",
+
+        custom: customInstruction
+          ? `Write an email with this specific goal: ${customInstruction}. ` +
+            "No raw amounts, no invoice numbers, no payment links. Use the account context for tone only."
+          : "Write a professional, human email based on the account context.",
       };
 
-      console.log(`\n[draft-email] ${email} — type=${type}`);
+      const instruction = typeInstructions[type] ?? typeInstructions["payment_reminder"];
 
+      const raw = await groq(
+        `You are ${FROM_NAME_DEFAULT}, writing a short personal email on behalf of the company.
+Follow every rule below without exception:
+1. Write like a real person talking to someone they know — not a billing system.
+2. NEVER include invoice numbers, rupee amounts, payment links, or any URLs.
+3. Refer to money only in vague terms: "the outstanding amount", "what's pending", "settle this".
+4. Maximum 3 short paragraphs. No bullet points. No tables. No headers.
+5. Subject line must be direct and human — avoid "Following up on your account" or similar filler.
+6. Sign off naturally as ${FROM_NAME_DEFAULT}. No "Best regards," or stiff closings.
+Return ONLY valid JSON with exactly two keys: { "subject": "...", "body": "..." }
+No markdown fences. No extra keys. No preamble.`,
+        `${instruction}
+
+ACCOUNT CONTEXT (internal use only — do not expose raw data in the email):
+${accountContext}
+
+Write the email now. Return JSON only.`,
+        700
+      );
+
+      let subject = "";
+      let body = "";
       try {
-        const [rows, emailEvents] = await Promise.all([
-          coralSql(`
-            SELECT
-              h.id AS hubspot_id, h.firstname, h.lastname, h.email,
-              h.company, h.lifecyclestage, h.createdate,
-              s.id AS invoice_id, s.number, s.status,
-              s.amount_due, s.amount_paid,
-              (s.amount_due - s.amount_paid) AS amount_remaining,
-              s.created, s.due_date, s.status_transitions__paid_at,
-              s.hosted_invoice_url, s.invoice_pdf, s.currency
-            FROM hubspot.contacts h
-            LEFT JOIN stripe.invoices s
-              ON LOWER(s.customer_email) = LOWER(h.email)
-            WHERE LOWER(h.email) = LOWER('${email.replace(/'/g, "''")}')
-            ORDER BY s.created DESC
-          `),
-          fetchEmailEvents(email),
-        ]);
-
-        const contact = rows.length ? {
-          id: rows[0].hubspot_id, firstname: rows[0].firstname,
-          lastname: rows[0].lastname, email: rows[0].email,
-          company: rows[0].company, lifecyclestage: rows[0].lifecyclestage,
-          createdate: rows[0].createdate,
-        } : null;
-
-        const invoices = rows
-          .filter(r => r.invoice_id != null)
-          .map(r => ({
-            id: r.invoice_id, number: r.number, status: r.status,
-            amount_due: r.amount_due, amount_paid: r.amount_paid,
-            amount_remaining: r.amount_remaining, created: r.created,
-            due_date: r.due_date, status_transitions__paid_at: r.status_transitions__paid_at,
-            hosted_invoice_url: r.hosted_invoice_url, invoice_pdf: r.invoice_pdf,
-          }));
-
-        const accountContext = buildAccountContext(email, contact, invoices, emailEvents);
-
-        const overdueLines = invoices
-          .filter(r => !["paid", "void"].includes(r.status) && daysOverdue(r.due_date) > 0)
-          .map(r => {
-            const link = r.hosted_invoice_url
-              ? `\n    Pay online: ${r.hosted_invoice_url}`
-              : "";
-            return `• Invoice #${r.number ?? r.id}: ${fmt(r.amount_remaining)} (due ${fmtDate(r.due_date)}, ${daysOverdue(r.due_date)} days overdue)${link}`;
-          })
-          .join("\n");
-
-        const typeInstructions: Record<string, string> = {
-          payment_reminder:
-            "Write a polite, professional payment reminder email. " +
-            "Reference the specific invoice amounts and due dates. " +
-            "Include the Stripe payment links directly in the email body so the customer can pay in one click. " +
-            "Keep it concise — 3 paragraphs max.",
-          overdue_followup:
-            "Write a firm but professional follow-up email for overdue payment. " +
-            "Acknowledge we haven't heard back, state the exact overdue amount, " +
-            "include the Stripe payment links, and request a response or payment within 48 hours. " +
-            "Do not be aggressive — preserve the business relationship.",
-          relationship_checkin:
-            "Write a friendly relationship check-in email that subtly references the outstanding balance. " +
-            "Lead with genuine interest in how their business is going, " +
-            "mention the invoice briefly at the end, and offer to discuss payment terms if needed.",
-          custom: customInstruction
-            ? `Write an email with this specific goal: ${customInstruction}. ` +
-              "Use the account context below. Include invoice links where relevant."
-            : "Write a professional email based on the account context below.",
-        };
-
-        const instruction = typeInstructions[type] ?? typeInstructions["payment_reminder"];
-
-        const raw = await groq(
-          `You are a professional B2B collections specialist writing on behalf of the company.
-  Write in a warm, professional tone. Always sign off as "${FROM_NAME_DEFAULT}".
-  Return ONLY a JSON object with exactly two keys: "subject" and "body".
-  The body should be plain text (no markdown). Use real line breaks.
-  Do NOT add any commentary, preamble, or extra keys.`,
-          `${instruction}
-
-  ACCOUNT CONTEXT:
-  ${accountContext}
-
-  ${overdueLines ? `OVERDUE INVOICES WITH PAYMENT LINKS:\n${overdueLines}` : ""}
-
-  Return JSON: { "subject": "...", "body": "..." }`,
-          900
-        );
-
-        let subject = "";
-        let body = "";
-        try {
-          const clean = raw.replace(/```json|```/g, "").trim();
-          const parsed = JSON.parse(clean);
-          subject = parsed.subject ?? "";
-          body    = parsed.body    ?? "";
-        } catch {
-          const subjectMatch = raw.match(/"subject"\s*:\s*"([^"]+)"/);
-          const bodyMatch    = raw.match(/"body"\s*:\s*"([\s\S]+?)"\s*}/);
-          subject = subjectMatch?.[1] ?? "Following up on your account";
-          body    = bodyMatch?.[1]?.replace(/\\n/g, "\n") ?? raw;
-        }
-
-        return res.json({ success: true, type, subject, body });
-      } catch (err: any) {
-        console.error("[draft-email] ❌", err.message);
-        return res.status(500).json({ success: false, error: err.message });
+        const clean = raw.replace(/```json|```/g, "").trim();
+        const parsed = JSON.parse(clean);
+        subject = parsed.subject ?? "";
+        body    = parsed.body    ?? "";
+      } catch {
+        const subjectMatch = raw.match(/"subject"\s*:\s*"([^"]+)"/);
+        const bodyMatch    = raw.match(/"body"\s*:\s*"([\s\S]+?)"\s*}/);
+        subject = subjectMatch?.[1] ?? "Quick note";
+        body    = bodyMatch?.[1]?.replace(/\\n/g, "\n") ?? raw;
       }
+
+      return res.json({ success: true, type, subject, body });
+    } catch (err: any) {
+      console.error("[draft-email] ❌", err.message);
+      return res.status(500).json({ success: false, error: err.message });
     }
-  );
+  }
+);
 
-  // ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
 
-  /**
-   * POST /api/customers/:email/send-email
-   *
-   * Sends an email via Resend directly from the product.
-   *
-   * Body:
-   *   {
-   *     subject:   string,
-   *     body:      string,       // plain-text email body
-   *     fromName?: string        // override sender name, defaults to FROM_NAME env
-   *   }
-   *
-   * Returns:
-   *   { success: true, messageId: string }
-   */
-  router.post(
-    "/customers/:email/send-email",
-    async (req: Request, res: Response) => {
-      const toEmail = decodeURIComponent(req.params.email).trim();
-      const {
+/**
+ * POST /api/customers/:email/send-email
+ *
+ * Sends an email via Resend directly from the product.
+ *
+ * Body:
+ *   {
+ *     subject:   string,
+ *     body:      string,       // plain-text email body
+ *     fromName?: string        // override sender name, defaults to FROM_NAME env
+ *   }
+ *
+ * Returns:
+ *   { success: true, messageId: string }
+ */
+router.post(
+  "/customers/:email/send-email",
+  async (req: Request, res: Response) => {
+    const toEmail = decodeURIComponent(req.params.email).trim();
+    const {
+      subject,
+      body,
+      fromName = FROM_NAME_DEFAULT,
+    } = req.body as {
+      subject:   string;
+      body:      string;
+      fromName?: string;
+    };
+
+    if (!subject || !body) {
+      return res.status(400).json({
+        success: false,
+        error: "subject and body are required",
+      });
+    }
+
+    const resendApiKey = process.env.RESEND_API_KEY;
+    if (!resendApiKey) {
+      return res.status(500).json({
+        success: false,
+        error: "RESEND_API_KEY is not configured",
+      });
+    }
+
+    console.log(`\n[send-email] Sending to ${toEmail}: "${subject}"`);
+
+    try {
+      const resend = new Resend(resendApiKey);
+
+      const { data, error } = await resend.emails.send({
+        from:    `${fromName} <${FROM_EMAIL}>`,
+        to:      [toEmail],
         subject,
-        body,
-        fromName = FROM_NAME_DEFAULT,
-      } = req.body as {
-        subject:   string;
-        body:      string;
-        fromName?: string;
-      };
+        text: body,
+        html: `<div style="font-family:sans-serif;max-width:640px;line-height:1.6;color:#1a1a1a;">${
+          body
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .split("\n\n")
+            .map(p => `<p style="margin:0 0 16px;">${p.replace(/\n/g, "<br>")}</p>`)
+            .join("")
+        }</div>`,
+      });
 
-      if (!subject || !body) {
-        return res.status(400).json({
-          success: false,
-          error: "subject and body are required",
-        });
+      if (error) {
+        console.error("[send-email] Resend error:", error);
+        return res.status(500).json({ success: false, error: error.message });
       }
 
-      const resendApiKey = process.env.RESEND_API_KEY;
-      if (!resendApiKey) {
-        return res.status(500).json({
-          success: false,
-          error: "RESEND_API_KEY is not configured",
-        });
-      }
-
-      console.log(`\n[send-email] Sending to ${toEmail}: "${subject}"`);
-
-      try {
-        const resend = new Resend(resendApiKey);
-
-        const { data, error } = await resend.emails.send({
-          from:    `${fromName} <${FROM_EMAIL}>`,
-          to:      [toEmail],
-          subject,
-          // Send as plain text; convert newlines to <br> for html version
-          text: body,
-          html: `<pre style="font-family:sans-serif;white-space:pre-wrap;max-width:640px;">${
-            body
-              .replace(/&/g, "&amp;")
-              .replace(/</g, "&lt;")
-              .replace(/>/g, "&gt;")
-              // Make Stripe invoice links clickable in the HTML version
-              .replace(
-                /(https:\/\/invoice\.stripe\.com\/[^\s]+)/g,
-                '<a href="$1" style="color:#0066cc;">Pay Invoice</a>'
-              )
-          }</pre>`,
-        });
-
-        if (error) {
-          console.error("[send-email] Resend error:", error);
-          return res.status(500).json({ success: false, error: error.message });
-        }
-
-        console.log(`[send-email] ✅ Sent. messageId=${data?.id}`);
-        return res.json({ success: true, messageId: data?.id });
-      } catch (err: any) {
-        console.error("[send-email] ❌", err.message);
-        return res.status(500).json({ success: false, error: err.message });
-      }
+      console.log(`[send-email] ✅ Sent. messageId=${data?.id}`);
+      return res.json({ success: true, messageId: data?.id });
+    } catch (err: any) {
+      console.error("[send-email] ❌", err.message);
+      return res.status(500).json({ success: false, error: err.message });
     }
-  );
+  }
+);
 
   export default router;
