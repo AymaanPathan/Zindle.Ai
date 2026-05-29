@@ -4,28 +4,36 @@ import type { AppDispatch, RootState } from "../store";
 import { sendMessage, clearChat } from "../store/slices/chatSlice";
 import type { ChatMessage } from "../store/slices/chatSlice";
 
-// ─── CSS ──────────────────────────────────────────────────────────────────────
-
 const css = `
-  @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; }
 
   .ch {
-    --w:    #ffffff;
-    --g50:  #f9fafb;
-    --g100: #f3f4f6;
-    --g200: #e5e7eb;
-    --g300: #d1d5db;
-    --g400: #9ca3af;
-    --g500: #6b7280;
-    --g600: #4b5563;
-    --g700: #374151;
-    --g900: #111827;
-    --serif: 'Instrument Serif', Georgia, serif;
-    --sans:  'Geist', -apple-system, system-ui, sans-serif;
-    --mono:  'Geist Mono', 'Fira Code', monospace;
+    --white:  #ffffff;
+    --bg:     #fafafa;
+    --s50:    #f7f7f8;
+    --s100:   #f0f0f2;
+    --s200:   #e4e4e8;
+    --s300:   #d0d0d6;
+    --s400:   #a0a0ab;
+    --s500:   #70707a;
+    --s600:   #4a4a55;
+    --s700:   #2e2e38;
+    --s900:   #0f0f14;
+    --accent: #0f0f14;
+    --blue:   #2563eb;
+    --green:  #16a34a;
+    --amber:  #d97706;
+    --red:    #dc2626;
+    --serif:  'DM Serif Display', Georgia, serif;
+    --sans:   'DM Sans', -apple-system, system-ui, sans-serif;
+    --mono:   'DM Mono', 'Fira Code', monospace;
+
     font-family: var(--sans);
     -webkit-font-smoothing: antialiased;
-    background: var(--w);
+    -moz-osx-font-smoothing: grayscale;
+    background: var(--white);
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -34,207 +42,214 @@ const css = `
     position: relative;
   }
 
-  /* scrollbar for message area */
-  .ch-scroll::-webkit-scrollbar { width: 3px; }
+  .ch-scroll::-webkit-scrollbar { width: 4px; }
   .ch-scroll::-webkit-scrollbar-track { background: transparent; }
-  .ch-scroll::-webkit-scrollbar-thumb { background: var(--g200); border-radius: 99px; }
+  .ch-scroll::-webkit-scrollbar-thumb { background: var(--s200); border-radius: 99px; }
 
   .ch-textarea { resize: none; }
   .ch-textarea:focus { outline: none; }
-  .ch-textarea::placeholder { color: var(--g400); }
+  .ch-textarea::placeholder { color: var(--s400); }
   .ch-textarea::-webkit-scrollbar { display: none; }
   .ch-textarea { scrollbar-width: none; -ms-overflow-style: none; }
 
   @keyframes ch-in {
-    from { opacity: 0; transform: translateY(8px); }
+    from { opacity: 0; transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0); }
   }
   @keyframes ch-up {
-    from { opacity: 0; transform: translateY(16px); }
+    from { opacity: 0; transform: translateY(12px); }
     to   { opacity: 1; transform: translateY(0); }
   }
   @keyframes ch-dot {
-    0%, 80%, 100% { transform: scale(0.55); opacity: 0.3; }
-    40%           { transform: scale(1);    opacity: 1; }
+    0%, 80%, 100% { transform: scale(0.5); opacity: 0.25; }
+    40%           { transform: scale(1);   opacity: 0.8; }
   }
   @keyframes ch-slide {
-    from { opacity: 0; transform: translateX(-4px); }
+    from { opacity: 0; transform: translateX(-3px); }
     to   { opacity: 1; transform: translateX(0); }
   }
-  @keyframes ch-shimmer {
-    from { background-position: -400px 0; }
-    to   { background-position: 400px 0; }
+  @keyframes ch-pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.4; }
   }
 
-  .ch-msg-in  { animation: ch-in 0.22s ease both; }
-  .ch-fade-up { animation: ch-up 0.35s cubic-bezier(0.16,1,0.3,1) both; }
-  .ch-slide   { animation: ch-slide 0.18s ease both; }
+  .ch-msg-in  { animation: ch-in 0.2s cubic-bezier(0.16,1,0.3,1) both; }
+  .ch-fade-up { animation: ch-up 0.4s cubic-bezier(0.16,1,0.3,1) both; }
+  .ch-slide   { animation: ch-slide 0.16s ease both; }
 
-  /* Chip suggestions */
-  .ch-chip {
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px 14px; border-radius: 10px;
-    border: 1px solid var(--g200); background: var(--w);
+  .ch-suggestion {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 11px 15px; border-radius: 8px;
+    border: 1px solid var(--s200); background: var(--white);
     cursor: pointer; font-family: var(--sans);
-    font-size: 12.5px; font-weight: 400; color: var(--g700);
+    font-size: 13px; font-weight: 400; color: var(--s600);
     letter-spacing: -0.01em; text-align: left; width: 100%;
-    transition: all 0.12s;
+    transition: border-color 0.12s, background 0.12s, color 0.12s;
+    gap: 8px;
   }
-  .ch-chip:hover {
-    background: var(--g50); border-color: var(--g300); color: var(--g900);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  .ch-suggestion:hover {
+    background: var(--s50); border-color: var(--s300); color: var(--s900);
+  }
+  .ch-suggestion-arrow {
+    color: var(--s300); font-size: 12px; flex-shrink: 0;
+    transition: color 0.12s, transform 0.12s;
+  }
+  .ch-suggestion:hover .ch-suggestion-arrow {
+    color: var(--s600); transform: translateX(2px);
   }
 
-  /* Send button */
-  .ch-send { transition: opacity 0.12s, transform 0.12s; }
-  .ch-send:hover:not(:disabled) { opacity: 0.85; transform: scale(1.04); }
-  .ch-send:active:not(:disabled) { transform: scale(0.96); }
+  .ch-send { transition: opacity 0.1s, transform 0.1s; }
+  .ch-send:hover:not(:disabled) { opacity: 0.85; }
+  .ch-send:active:not(:disabled) { transform: scale(0.94); }
 
-  /* Input wrap focus ring */
   .ch-input-wrap { transition: border-color 0.15s, box-shadow 0.15s; }
   .ch-input-wrap:focus-within {
-    border-color: var(--g400) !important;
-    box-shadow: 0 0 0 3px rgba(0,0,0,0.04);
+    border-color: var(--s400) !important;
+    box-shadow: 0 0 0 3px rgba(15,15,20,0.06);
   }
 
-  /* Quick pill buttons */
   .ch-pill {
     display: inline-flex; align-items: center;
-    padding: 4px 12px; border-radius: 99px;
-    border: 1px solid var(--g200); background: var(--w);
-    font-size: 12px; color: var(--g500); cursor: pointer;
-    font-family: var(--sans); letter-spacing: -0.01em;
-    transition: all 0.1s; white-space: nowrap; flex-shrink: 0;
+    padding: 5px 12px; border-radius: 6px;
+    border: 1px solid var(--s200); background: var(--white);
+    font-size: 12px; font-weight: 400; color: var(--s500);
+    cursor: pointer; font-family: var(--sans);
+    letter-spacing: -0.01em; transition: all 0.1s;
+    white-space: nowrap; flex-shrink: 0;
   }
-  .ch-pill:hover { background: var(--g50); color: var(--g900); border-color: var(--g300); }
+  .ch-pill:hover { background: var(--s50); color: var(--s900); border-color: var(--s300); }
 
-  /* Code block */
-  .ch-code {
-    background: var(--g900); border-radius: 10px; overflow: hidden;
-  }
+  .ch-code { background: var(--s900); border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.06); }
   .ch-code-header {
-    padding: 7px 14px; background: rgba(255,255,255,0.06);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 8px 14px; background: rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
     display: flex; align-items: center; justify-content: space-between;
   }
   .ch-code pre {
     padding: 14px 16px; margin: 0;
-    font-family: var(--mono); font-size: 12.5px;
-    color: #e2e8f0; line-height: 1.7; overflow-x: auto;
+    font-family: var(--mono); font-size: 12px;
+    color: #e2e8f0; line-height: 1.75; overflow-x: auto;
   }
   .ch-copy-btn {
     background: none; border: none; cursor: pointer;
-    color: var(--g400); font-family: var(--sans); font-size: 11px;
-    padding: 2px 7px; border-radius: 4px; transition: all 0.1s;
+    color: var(--s400); font-family: var(--sans); font-size: 11px;
+    padding: 2px 8px; border-radius: 4px; transition: all 0.1s;
   }
-  .ch-copy-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  .ch-copy-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
 
-  /* Table */
-  .ch-table-wrap { border-radius: 10px; overflow: hidden; border: 1px solid var(--g200); }
+  .ch-table-wrap { border-radius: 8px; overflow: hidden; border: 1px solid var(--s200); }
   .ch-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
   .ch-table th {
-    padding: 8px 14px; text-align: left; font-size: 10px; font-weight: 600;
-    color: var(--g400); text-transform: uppercase; letter-spacing: 0.09em;
-    background: var(--g50); border-bottom: 1px solid var(--g200);
+    padding: 9px 14px; text-align: left; font-size: 10.5px; font-weight: 500;
+    color: var(--s400); text-transform: uppercase; letter-spacing: 0.07em;
+    background: var(--s50); border-bottom: 1px solid var(--s200);
   }
   .ch-table td {
-    padding: 9px 14px; color: var(--g600); border-bottom: 1px solid var(--g100);
-    vertical-align: middle; letter-spacing: -0.01em;
+    padding: 10px 14px; color: var(--s600); border-bottom: 1px solid var(--s100);
+    vertical-align: middle; letter-spacing: -0.01em; font-size: 13px;
   }
   .ch-table tr:last-child td { border-bottom: none; }
-  .ch-table tr:hover td { color: var(--g900); background: var(--g50); }
+  .ch-table tr:hover td { color: var(--s900); background: var(--s50); }
 
-  .ch-stat { background: var(--w); border: 1px solid var(--g200); border-radius: 10px; padding: 13px 14px; }
+  .ch-stat {
+    background: var(--white); border: 1px solid var(--s200);
+    border-radius: 8px; padding: 14px 16px;
+  }
 
   .ch-rank {
-    display: flex; align-items: flex-start; gap: 11px;
-    padding: 10px 0; border-bottom: 1px solid var(--g100);
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 11px 0; border-bottom: 1px solid var(--s100);
   }
   .ch-rank:first-child { padding-top: 0; }
-  .ch-rank:last-child { border-bottom: none; padding-bottom: 0; }
+  .ch-rank:last-child  { border-bottom: none; padding-bottom: 0; }
 
   .ch-action-item {
-    display: flex; align-items: flex-start; gap: 9px;
-    background: var(--w); border: 1px solid var(--g200);
-    border-radius: 8px; padding: 8px 12px;
+    display: flex; align-items: flex-start; gap: 10px;
+    background: var(--white); border: 1px solid var(--s200);
+    border-radius: 7px; padding: 9px 12px;
   }
 
   .ch-insight {
     display: flex; gap: 10px; align-items: flex-start;
-    padding: 10px 13px; border-radius: 8px; border: 1px solid;
+    padding: 11px 14px; border-radius: 7px; border: 1px solid;
   }
 
-  .ch-card { background: var(--g50); border: 1px solid var(--g200); border-radius: 12px; overflow: hidden; }
+  .ch-card {
+    background: var(--white); border: 1px solid var(--s200);
+    border-radius: 10px; overflow: hidden;
+  }
   .ch-card-header {
-    padding: 10px 16px; background: var(--w);
-    border-bottom: 1px solid var(--g200);
+    padding: 10px 16px; background: var(--s50);
+    border-bottom: 1px solid var(--s200);
     display: flex; align-items: center; gap: 8px;
   }
-  .ch-card-body { padding: 14px 16px; }
+  .ch-card-body { padding: 0 16px 4px; }
 
-  /* Scroll-to-bottom button */
   .ch-scroll-btn {
-    position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%);
-    width: 32px; height: 32px; border-radius: 50%;
-    background: var(--w); border: 1px solid var(--g200);
+    position: absolute; bottom: 96px; left: 50%; transform: translateX(-50%);
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--white); border: 1px solid var(--s200);
     display: flex; align-items: center; justify-content: center;
     cursor: pointer; z-index: 10;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    transition: all 0.15s;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    transition: all 0.12s;
   }
-  .ch-scroll-btn:hover { background: var(--g50); border-color: var(--g300); }
+  .ch-scroll-btn:hover { background: var(--s50); border-color: var(--s300); }
 
-  .ch-shimmer {
-    background: linear-gradient(90deg, var(--g100) 0%, var(--g50) 50%, var(--g100) 100%);
-    background-size: 400px 100%;
-    animation: ch-shimmer 1.5s ease infinite;
-    border-radius: 6px;
+  .ch-status-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: #22c55e;
+    animation: ch-pulse 2.5s ease-in-out infinite;
   }
+
+  .ch-clear-btn {
+    background: none; border: 1px solid var(--s200); border-radius: 6px;
+    padding: 5px 11px; cursor: pointer; font-size: 11.5px;
+    color: var(--s500); font-family: var(--sans); letter-spacing: -0.01em;
+    transition: all 0.1s; font-weight: 400;
+  }
+  .ch-clear-btn:hover { border-color: var(--s300); color: var(--s900); background: var(--s50); }
+
+  .ch-wordmark {
+    font-family: var(--sans); font-size: 13px; font-weight: 600;
+    color: var(--s900); letter-spacing: -0.03em;
+  }
+  .ch-wordmark span { color: var(--s400); font-weight: 400; }
 `;
-
-// ─── Formatters ───────────────────────────────────────────────────────────────
 
 function fmtTime(iso: string) {
   return new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
 }
 
-// ─── Logo mark ────────────────────────────────────────────────────────────────
+// ── Logo ──────────────────────────────────────────────────────────────────────
 
-function AIMark({ size = 28 }: { size?: number }) {
+function LogoMark({ size = 24 }: { size?: number }) {
   return (
-    <div style={{
-      width: size, height: size, borderRadius: size * 0.28,
-      background: "#111827",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      flexShrink: 0,
-    }}>
-      <svg width={size * 0.46} height={size * 0.46} viewBox="0 0 14 14" fill="none">
-        <path
-          d="M7 1C7 1 7.6 4.4 9 5.8C10.4 7.2 13 7 13 7C13 7 10.4 6.8 9 8.2C7.6 9.6 7 13 7 13C7 13 6.4 9.6 5 8.2C3.6 6.8 1 7 1 7C1 7 3.6 7.2 5 5.8C6.4 4.4 7 1 7 1Z"
-          fill="white"
-        />
-      </svg>
-    </div>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="24" height="24" rx="6" fill="#0f0f14"/>
+      <path d="M8 16L12 8L16 16" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M9.5 13.5H14.5" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
   );
 }
 
-// ─── Thinking bubble ──────────────────────────────────────────────────────────
+// ── Thinking ──────────────────────────────────────────────────────────────────
 
 function ThinkingBubble() {
   return (
-    <div style={{ display: "flex", gap: 12, alignItems: "flex-end" }}>
-      <AIMark size={26} />
+    <div style={{ display: "flex", gap: 11, alignItems: "flex-start", paddingLeft: 0 }}>
+      <div style={{ paddingTop: 2, flexShrink: 0 }}>
+        <LogoMark size={22} />
+      </div>
       <div style={{
-        padding: "12px 16px", borderRadius: "4px 14px 14px 14px",
-        background: "#f9fafb", border: "1px solid #e5e7eb",
-        display: "flex", gap: 5, alignItems: "center",
+        padding: "10px 14px", borderRadius: "4px 12px 12px 12px",
+        background: "var(--s50)", border: "1px solid var(--s200)",
+        display: "flex", gap: 4, alignItems: "center",
       }}>
         {[0, 1, 2].map(i => (
           <span key={i} style={{
-            display: "inline-block", width: 5, height: 5, borderRadius: "50%",
-            background: "#9ca3af",
-            animation: `ch-dot 1.2s ease-in-out ${i * 0.15}s infinite`,
+            display: "inline-block", width: 4, height: 4, borderRadius: "50%",
+            background: "var(--s400)",
+            animation: `ch-dot 1.1s ease-in-out ${i * 0.18}s infinite`,
           }} />
         ))}
       </div>
@@ -242,10 +257,10 @@ function ThinkingBubble() {
   );
 }
 
-// ─── Block parser (identical logic, cleaned up) ───────────────────────────────
+// ── Block types ───────────────────────────────────────────────────────────────
 
 type Block =
-  | { type: "heading"; level: 1 | 2 | 3; text: string }
+  | { type: "heading"; level: 1|2|3; text: string }
   | { type: "paragraph"; text: string }
   | { type: "bullet"; items: string[] }
   | { type: "numbered"; items: string[] }
@@ -253,7 +268,7 @@ type Block =
   | { type: "table"; headers: string[]; rows: string[][] }
   | { type: "stats"; items: { label: string; value: string; accent?: string }[] }
   | { type: "ranked"; items: RankItem[] }
-  | { type: "insight"; variant: "warning" | "success" | "info" | "danger"; text: string }
+  | { type: "insight"; variant: "warning"|"success"|"info"|"danger"; text: string }
   | { type: "actions"; items: string[] };
 
 interface RankItem {
@@ -266,14 +281,14 @@ function parseAmt(t: string) {
 }
 
 function riskTag(t: string): { tag: string; color: string } | null {
-  if (/high.?risk|critical|urgent/i.test(t)) return { tag: "High risk", color: "#b91c1c" };
-  if (/overdue|past.?due/i.test(t))           return { tag: "Overdue",   color: "#92400e" };
-  if (/review/i.test(t))                       return { tag: "Review",    color: "#1e40af" };
-  if (/settled|paid/i.test(t))                 return { tag: "Settled",   color: "#14532d" };
+  if (/high.?risk|critical|urgent/i.test(t)) return { tag: "High risk", color: "#dc2626" };
+  if (/overdue|past.?due/i.test(t))           return { tag: "Overdue",   color: "#d97706" };
+  if (/review/i.test(t))                       return { tag: "Review",    color: "#2563eb" };
+  if (/settled|paid/i.test(t))                 return { tag: "Settled",   color: "#16a34a" };
   return null;
 }
 
-function insightVariant(t: string): "warning" | "success" | "info" | "danger" {
+function insightVariant(t: string): "warning"|"success"|"info"|"danger" {
   if (/⚠|warning|overdue|risk|urgent/i.test(t)) return "warning";
   if (/✅|good|healthy|paid|settled/i.test(t))   return "success";
   if (/❌|error|critical|failed/i.test(t))       return "danger";
@@ -317,7 +332,7 @@ function parseBlocks(text: string): Block[] {
         const amount = parseAmt(body);
         const noteM = body.match(/[—–]\s*(.+)$/);
         const note = noteM ? noteM[1].replace(/\*+/g, "").trim() : undefined;
-        items.push({ rank, name, amount, tag: tag?.tag, tagColor: tag?.color, note, progress: Math.max(15, 100 - (rank - 1) * 14) });
+        items.push({ rank, name, amount, tag: tag?.tag, tagColor: tag?.color, note, progress: Math.max(12, 100 - (rank - 1) * 14) });
         i++;
       }
       blocks.push({ type: "ranked", items }); continue;
@@ -335,8 +350,8 @@ function parseBlocks(text: string): Block[] {
           const value = m[2].trim().replace(/\*+/g, "");
           let accent: string | undefined;
           if (/paid|collected|success/i.test(label)) accent = "#16a34a";
-          else if (/outstanding|overdue|due/i.test(label)) accent = "#92400e";
-          else if (/risk|churn/i.test(label)) accent = "#b91c1c";
+          else if (/outstanding|overdue|due/i.test(label)) accent = "#d97706";
+          else if (/risk|churn/i.test(label)) accent = "#dc2626";
           return { label, value, accent };
         }).filter(Boolean) as { label: string; value: string; accent?: string }[];
         if (stats.length >= 2) { blocks.push({ type: "stats", items: stats }); continue; }
@@ -360,35 +375,34 @@ function parseBlocks(text: string): Block[] {
   return blocks;
 }
 
-// ─── Inline renderer ──────────────────────────────────────────────────────────
-
 function Inline({ text }: { text: string }) {
   const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
   return (
     <>
       {parts.map((p, i) => {
         if (p.startsWith("**") && p.endsWith("**"))
-          return <strong key={i} style={{ fontWeight: 600, color: "#111827" }}>{p.slice(2,-2)}</strong>;
+          return <strong key={i} style={{ fontWeight: 600, color: "var(--s900)" }}>{p.slice(2,-2)}</strong>;
         if (p.startsWith("`") && p.endsWith("`"))
-          return <code key={i} style={{ fontFamily: "var(--mono)", fontSize: "12px", background: "#f3f4f6", padding: "1px 6px", borderRadius: 4, color: "#374151" }}>{p.slice(1,-1)}</code>;
+          return <code key={i} style={{ fontFamily: "var(--mono)", fontSize: "11.5px", background: "var(--s100)", padding: "1px 6px", borderRadius: 4, color: "var(--s700)" }}>{p.slice(1,-1)}</code>;
         return <span key={i}>{p}</span>;
       })}
     </>
   );
 }
 
-// ─── Block renderers ──────────────────────────────────────────────────────────
-
 function HeadingBlock({ level, text }: { level: 1|2|3; text: string }) {
-  const sizes = { 1: "18px", 2: "15px", 3: "13.5px" };
+  const sizes = { 1: "19px", 2: "14.5px", 3: "13px" };
   return (
     <div style={{
       fontFamily: level === 1 ? "var(--serif)" : "var(--sans)",
-      fontSize: sizes[level], fontWeight: level === 1 ? 400 : 600,
-      color: "#111827", letterSpacing: level === 1 ? "-0.02em" : "-0.015em",
+      fontSize: sizes[level],
+      fontWeight: level === 1 ? 400 : 600,
+      color: "var(--s900)",
+      letterSpacing: level === 1 ? "-0.02em" : "-0.02em",
       lineHeight: 1.25,
-      paddingBottom: level < 3 ? "6px" : 0,
-      borderBottom: level === 1 ? "1px solid #e5e7eb" : "none",
+      paddingBottom: level < 3 ? 8 : 0,
+      borderBottom: level === 1 ? "1px solid var(--s200)" : "none",
+      fontStyle: level === 1 ? "italic" : "normal",
     }}>
       {text}
     </div>
@@ -397,7 +411,7 @@ function HeadingBlock({ level, text }: { level: 1|2|3; text: string }) {
 
 function ParagraphBlock({ text }: { text: string }) {
   return (
-    <p style={{ fontSize: "13.5px", color: "#4b5563", lineHeight: 1.7, letterSpacing: "-0.01em", margin: 0 }}>
+    <p style={{ fontSize: "13.5px", color: "var(--s600)", lineHeight: 1.72, letterSpacing: "-0.01em", margin: 0, fontWeight: 400 }}>
       <Inline text={text} />
     </p>
   );
@@ -405,10 +419,10 @@ function ParagraphBlock({ text }: { text: string }) {
 
 function BulletBlock({ items }: { items: string[] }) {
   return (
-    <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 4 }}>
+    <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 5 }}>
       {items.map((item, i) => (
-        <li key={i} style={{ display: "flex", gap: 9, fontSize: "13px", color: "#4b5563", lineHeight: 1.65 }}>
-          <span style={{ color: "#9ca3af", flexShrink: 0, marginTop: 5, fontSize: 6 }}>◆</span>
+        <li key={i} style={{ display: "flex", gap: 10, fontSize: "13px", color: "var(--s600)", lineHeight: 1.65 }}>
+          <span style={{ color: "var(--s300)", flexShrink: 0, marginTop: 7, width: 4, height: 4, borderRadius: "50%", background: "var(--s300)", display: "inline-block" }} />
           <Inline text={item} />
         </li>
       ))}
@@ -420,12 +434,12 @@ function NumberedBlock({ items }: { items: string[] }) {
   return (
     <ol style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 5 }}>
       {items.map((item, i) => (
-        <li key={i} style={{ display: "flex", gap: 9, fontSize: "13px", color: "#4b5563", lineHeight: 1.65 }}>
+        <li key={i} style={{ display: "flex", gap: 10, fontSize: "13px", color: "var(--s600)", lineHeight: 1.65 }}>
           <span style={{
             flexShrink: 0, width: 18, height: 18, borderRadius: 5,
-            background: "#f3f4f6", border: "1px solid #e5e7eb",
+            background: "var(--s100)", border: "1px solid var(--s200)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: "10px", fontWeight: 600, color: "#6b7280", marginTop: 2,
+            fontSize: "10px", fontWeight: 500, color: "var(--s500)", marginTop: 2, fontFamily: "var(--mono)",
           }}>{i + 1}</span>
           <Inline text={item} />
         </li>
@@ -440,7 +454,7 @@ function CodeBlock({ lang, code }: { lang: string; code: string }) {
   return (
     <div className="ch-code">
       <div className="ch-code-header">
-        <span style={{ fontSize: "10.5px", color: "#9ca3af", fontFamily: "var(--mono)" }}>{lang}</span>
+        <span style={{ fontSize: "10.5px", color: "#6b7280", fontFamily: "var(--mono)", fontWeight: 500 }}>{lang}</span>
         <button className="ch-copy-btn" onClick={copy}>{copied ? "✓ copied" : "copy"}</button>
       </div>
       <pre><code>{code}</code></pre>
@@ -466,10 +480,10 @@ function StatsBlock({ items }: { items: { label: string; value: string; accent?:
     <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(items.length, 3)}, 1fr)`, gap: 8 }}>
       {items.map((s, i) => (
         <div key={i} className="ch-stat">
-          <div style={{ fontSize: "9.5px", fontWeight: 600, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
+          <div style={{ fontSize: "10px", fontWeight: 500, color: "var(--s400)", textTransform: "uppercase", letterSpacing: "0.09em", marginBottom: 8 }}>
             {s.label}
           </div>
-          <div style={{ fontFamily: "var(--serif)", fontSize: "21px", fontWeight: 400, color: s.accent || "#111827", letterSpacing: "-0.02em", lineHeight: 1 }}>
+          <div style={{ fontFamily: "var(--serif)", fontSize: "22px", fontWeight: 400, color: s.accent || "var(--s900)", letterSpacing: "-0.02em", lineHeight: 1, fontStyle: "italic" }}>
             {s.value}
           </div>
         </div>
@@ -482,50 +496,50 @@ function RankedBlock({ items }: { items: RankItem[] }) {
   return (
     <div className="ch-card">
       <div className="ch-card-header">
-        <div style={{ width: 16, height: 16, borderRadius: 4, background: "#111827", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-          <svg width="8" height="8" viewBox="0 0 14 14" fill="none">
-            <path d="M7 1C7 1 7.6 4.4 9 5.8C10.4 7.2 13 7 13 7C13 7 10.4 6.8 9 8.2C7.6 9.6 7 13 7 13C7 13 6.4 9.6 5 8.2C3.6 6.8 1 7 1 7C1 7 3.6 7.2 5 5.8C6.4 4.4 7 1 7 1Z" fill="white"/>
-          </svg>
-        </div>
-        <span style={{ fontSize: "11.5px", fontWeight: 600, color: "#4b5563", letterSpacing: "-0.01em" }}>Ranked results</span>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M2 10L6 2L10 10" stroke="var(--s500)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M3.5 7.5H8.5" stroke="var(--s500)" strokeWidth="1.4" strokeLinecap="round"/>
+        </svg>
+        <span style={{ fontSize: "11px", fontWeight: 500, color: "var(--s500)", letterSpacing: "-0.01em" }}>Ranked results</span>
+        <span style={{ fontSize: "10.5px", color: "var(--s400)", marginLeft: "auto" }}>{items.length} items</span>
       </div>
       <div className="ch-card-body">
         {items.map((item, idx) => (
-          <div key={idx} className="ch-rank ch-slide" style={{ animationDelay: `${idx * 0.04}s` }}>
+          <div key={idx} className="ch-rank ch-slide" style={{ animationDelay: `${idx * 0.03}s` }}>
             <div style={{
-              width: 22, height: 22, borderRadius: 6, flexShrink: 0,
-              background: idx === 0 ? "#111827" : "#f3f4f6",
-              border: `1px solid ${idx === 0 ? "#111827" : "#e5e7eb"}`,
+              width: 20, height: 20, borderRadius: 5, flexShrink: 0,
+              background: idx === 0 ? "var(--s900)" : "var(--s100)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: "10.5px", fontWeight: 600, color: idx === 0 ? "#fff" : "#6b7280",
-              marginTop: 1,
+              fontSize: "10px", fontWeight: 500,
+              color: idx === 0 ? "#fff" : "var(--s500)",
+              fontFamily: "var(--mono)", marginTop: 1,
             }}>
               {item.rank}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                <span style={{ fontSize: "13px", fontWeight: 500, color: "#111827", letterSpacing: "-0.015em" }}>{item.name}</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 7, flexWrap: "wrap" }}>
+                <span style={{ fontSize: "13px", fontWeight: 500, color: "var(--s900)", letterSpacing: "-0.015em" }}>{item.name}</span>
                 {item.tag && (
                   <span style={{
-                    fontSize: "10px", fontWeight: 600, padding: "1px 7px", borderRadius: 99,
-                    letterSpacing: "0.04em", textTransform: "uppercase",
-                    background: item.tagColor ? item.tagColor + "14" : "#f3f4f6",
-                    color: item.tagColor || "#4b5563",
-                    border: `1px solid ${item.tagColor ? item.tagColor + "28" : "#e5e7eb"}`,
+                    fontSize: "10px", fontWeight: 500, padding: "1px 7px", borderRadius: 4,
+                    letterSpacing: "0.03em",
+                    background: (item.tagColor || "#4a4a55") + "12",
+                    color: item.tagColor || "var(--s600)",
+                    border: `1px solid ${(item.tagColor || "#4a4a55") + "22"}`,
                   }}>
                     {item.tag}
                   </span>
                 )}
                 {item.amount && (
-                  <span style={{ fontFamily: "var(--serif)", fontSize: "15px", color: "#111827", letterSpacing: "-0.02em", marginLeft: "auto" }}>
+                  <span style={{ fontFamily: "var(--mono)", fontSize: "13px", color: "var(--s700)", letterSpacing: "-0.02em", marginLeft: "auto", fontWeight: 500 }}>
                     {item.amount}
                   </span>
                 )}
               </div>
-              {item.note && <div style={{ fontSize: "12px", color: "#6b7280", marginTop: 3, lineHeight: 1.5 }}>{item.note}</div>}
+              {item.note && <div style={{ fontSize: "11.5px", color: "var(--s400)", marginTop: 3, lineHeight: 1.5 }}>{item.note}</div>}
               {item.progress !== undefined && (
-                <div style={{ height: 2, borderRadius: 99, background: "#f3f4f6", marginTop: 7, overflow: "hidden" }}>
-                  <div style={{ height: "100%", borderRadius: 99, width: `${item.progress}%`, background: "#111827", transition: "width 0.6s ease" }} />
+                <div style={{ height: 2, borderRadius: 99, background: "var(--s100)", marginTop: 8, overflow: "hidden" }}>
+                  <div style={{ height: "100%", borderRadius: 99, width: `${item.progress}%`, background: "var(--s300)", transition: "width 0.5s ease" }} />
                 </div>
               )}
             </div>
@@ -537,17 +551,17 @@ function RankedBlock({ items }: { items: RankItem[] }) {
 }
 
 function InsightBlock({ variant, text }: { variant: string; text: string }) {
-  const map: Record<string, { bg: string; border: string; accent: string; icon: string }> = {
-    warning: { bg: "#fffbeb", border: "#fde68a", accent: "#92400e", icon: "⚠" },
-    success: { bg: "#f0fdf4", border: "#d1fae5", accent: "#14532d", icon: "✓" },
-    danger:  { bg: "#fef2f2", border: "#fecaca", accent: "#b91c1c", icon: "✗" },
-    info:    { bg: "#eff6ff", border: "#bfdbfe", accent: "#1e40af", icon: "ℹ" },
+  const map: Record<string, { bg: string; border: string; accent: string; label: string }> = {
+    warning: { bg: "#fffbeb", border: "#fde68a", accent: "#d97706", label: "Warning" },
+    success: { bg: "#f0fdf4", border: "#bbf7d0", accent: "#16a34a", label: "Note" },
+    danger:  { bg: "#fef2f2", border: "#fecaca", accent: "#dc2626", label: "Alert" },
+    info:    { bg: "#eff6ff", border: "#bfdbfe", accent: "#2563eb", label: "Info" },
   };
   const c = map[variant] || map.info;
   return (
     <div className="ch-insight" style={{ background: c.bg, borderColor: c.border }}>
-      <span style={{ fontSize: "12px", color: c.accent, flexShrink: 0, lineHeight: 1.7, fontWeight: 600 }}>{c.icon}</span>
-      <span style={{ fontSize: "13px", color: "#374151", lineHeight: 1.65, letterSpacing: "-0.01em" }}>
+      <span style={{ fontSize: "10px", fontWeight: 600, color: c.accent, flexShrink: 0, lineHeight: 1.9, letterSpacing: "0.06em", textTransform: "uppercase" }}>{c.label}</span>
+      <span style={{ fontSize: "13px", color: "var(--s700)", lineHeight: 1.65, letterSpacing: "-0.01em" }}>
         <Inline text={text} />
       </span>
     </div>
@@ -560,15 +574,11 @@ function ActionsBlock({ items }: { items: string[] }) {
       {items.map((item, i) => (
         <div key={i} className="ch-action-item">
           <div style={{
-            width: 16, height: 16, borderRadius: 4, flexShrink: 0,
-            border: "1px solid #d1d5db", background: "#f9fafb",
-            display: "flex", alignItems: "center", justifyContent: "center", marginTop: 2,
-          }}>
-            <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
-              <path d="M2 5l2.5 2.5L8 2.5" stroke="#9ca3af" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
-          <span style={{ fontSize: "12.5px", color: "#374151", lineHeight: 1.55, letterSpacing: "-0.01em" }}>
+            width: 14, height: 14, borderRadius: 3, flexShrink: 0,
+            border: "1.5px solid var(--s300)", background: "var(--white)",
+            marginTop: 3,
+          }} />
+          <span style={{ fontSize: "13px", color: "var(--s700)", lineHeight: 1.6, letterSpacing: "-0.01em" }}>
             <Inline text={item} />
           </span>
         </div>
@@ -600,24 +610,23 @@ function ResponseRenderer({ text }: { text: string }) {
   );
 }
 
-// ─── Message bubbles ──────────────────────────────────────────────────────────
-
 function UserBubble({ msg }: { msg: ChatMessage }) {
   return (
     <div style={{ display: "flex", justifyContent: "flex-end" }}>
-      <div style={{ maxWidth: "72%", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+      <div style={{ maxWidth: "68%", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
         <div style={{
-          padding: "11px 16px",
-          borderRadius: "18px 4px 18px 18px",
-          background: "#111827",
+          padding: "10px 16px",
+          borderRadius: "14px 3px 14px 14px",
+          background: "var(--s900)",
           color: "#ffffff",
-          fontSize: "14px",
-          lineHeight: 1.6,
+          fontSize: "13.5px",
+          lineHeight: 1.65,
           letterSpacing: "-0.01em",
+          fontWeight: 400,
         }}>
           {msg.text}
         </div>
-        <span style={{ fontSize: "10.5px", color: "#9ca3af", paddingRight: 2 }}>
+        <span style={{ fontSize: "10px", color: "var(--s400)", paddingRight: 2, fontVariantNumeric: "tabular-nums" }}>
           {fmtTime(msg.timestamp)}
         </span>
       </div>
@@ -627,18 +636,20 @@ function UserBubble({ msg }: { msg: ChatMessage }) {
 
 function AssistantBubble({ msg }: { msg: ChatMessage }) {
   return (
-    <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-      <AIMark size={28} />
+    <div style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
+      <div style={{ paddingTop: 2, flexShrink: 0 }}>
+        <LogoMark size={22} />
+      </div>
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 5 }}>
         <div style={{
-          background: "#f9fafb",
-          border: "1px solid #e5e7eb",
-          borderRadius: "4px 18px 18px 18px",
+          background: "var(--s50)",
+          border: "1px solid var(--s200)",
+          borderRadius: "3px 14px 14px 14px",
           padding: "14px 18px",
         }}>
           <ResponseRenderer text={msg.text} />
         </div>
-        <span style={{ fontSize: "10.5px", color: "#9ca3af", paddingLeft: 2 }}>
+        <span style={{ fontSize: "10px", color: "var(--s400)", paddingLeft: 2, fontVariantNumeric: "tabular-nums" }}>
           {fmtTime(msg.timestamp)}
         </span>
       </div>
@@ -646,60 +657,44 @@ function AssistantBubble({ msg }: { msg: ChatMessage }) {
   );
 }
 
-// ─── Header ───────────────────────────────────────────────────────────────────
-
 function ChatHeader({ hasMessages, onClear }: { hasMessages: boolean; onClear: () => void }) {
   return (
     <div style={{
-      borderBottom: "1px solid #e5e7eb",
-      padding: "12px 24px",
+      borderBottom: "1px solid var(--s200)",
+      padding: "0 24px",
+      height: 52,
       display: "flex", alignItems: "center", gap: 12,
-      background: "#ffffff",
+      background: "var(--white)",
       flexShrink: 0,
     }}>
-      <AIMark size={26} />
-      <div style={{ flex: 1 }}>
-        <div style={{ fontSize: "13.5px", fontWeight: 600, color: "#111827", letterSpacing: "-0.02em" }}>
-          Collections AI
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
-          <span style={{
-            width: 5, height: 5, borderRadius: "50%", background: "#22c55e",
-            display: "inline-block",
-          }} />
-          <span style={{ fontSize: "11px", color: "#9ca3af", letterSpacing: "-0.01em" }}>
-            Live · Stripe & HubSpot connected
+      <LogoMark size={22} />
+      <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 10 }}>
+        <span className="ch-wordmark">Collections<span> AI</span></span>
+        <div style={{
+          display: "flex", alignItems: "center", gap: 5,
+          padding: "3px 8px", borderRadius: 5,
+          background: "var(--s50)", border: "1px solid var(--s200)",
+        }}>
+          <span className="ch-status-dot" />
+          <span style={{ fontSize: "11px", color: "var(--s500)", fontWeight: 400, letterSpacing: "-0.01em" }}>
+            Stripe · HubSpot
           </span>
         </div>
       </div>
       {hasMessages && (
-        <button
-          onClick={onClear}
-          style={{
-            background: "none", border: "1px solid #e5e7eb", borderRadius: 7,
-            padding: "5px 12px", cursor: "pointer", fontSize: "12px",
-            color: "#6b7280", fontFamily: "var(--sans)", letterSpacing: "-0.01em",
-            transition: "all 0.1s",
-          }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = "#d1d5db"; e.currentTarget.style.color = "#111827"; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = "#e5e7eb"; e.currentTarget.style.color = "#6b7280"; }}
-        >
-          Clear chat
-        </button>
+        <button className="ch-clear-btn" onClick={onClear}>Clear</button>
       )}
     </div>
   );
 }
 
-// ─── Empty state ──────────────────────────────────────────────────────────────
-
 const SUGGESTIONS = [
-  { text: "Who should I call today?",           icon: "📞" },
-  { text: "Show all overdue invoices",           icon: "⏰" },
-  { text: "Which customers are at churn risk?",  icon: "⚠️" },
-  { text: "Revenue summary this month",          icon: "📊" },
-  { text: "Show highest outstanding balances",   icon: "💰" },
-  { text: "Who pays late but always converts?",  icon: "🔄" },
+  { text: "Who should I call today?" },
+  { text: "Show all overdue invoices" },
+  { text: "Which customers are at churn risk?" },
+  { text: "Revenue summary this month" },
+  { text: "Highest outstanding balances" },
+  { text: "Who pays late but always converts?" },
 ];
 
 function EmptyState({ onSend }: { onSend: (t: string) => void }) {
@@ -710,57 +705,51 @@ function EmptyState({ onSend }: { onSend: (t: string) => void }) {
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      padding: "48px 32px 32px",
-      gap: 32,
+      padding: "48px 32px 24px",
     }}>
-      <div style={{ textAlign: "center" }} className="ch-fade-up">
-        <div style={{
-          width: 48, height: 48, borderRadius: 14,
-          background: "#111827",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          margin: "0 auto 18px",
-        }}>
-          <svg width="22" height="22" viewBox="0 0 14 14" fill="none">
-            <path d="M7 1C7 1 7.6 4.4 9 5.8C10.4 7.2 13 7 13 7C13 7 10.4 6.8 9 8.2C7.6 9.6 7 13 7 13C7 13 6.4 9.6 5 8.2C3.6 6.8 1 7 1 7C1 7 3.6 7.2 5 5.8C6.4 4.4 7 1 7 1Z" fill="white"/>
-          </svg>
+      <div style={{ width: "100%", maxWidth: 460 }}>
+        {/* Heading */}
+        <div className="ch-fade-up" style={{ marginBottom: 32 }}>
+          <div style={{ marginBottom: 16 }}>
+            <LogoMark size={32} />
+          </div>
+          <h1 style={{
+            fontFamily: "var(--serif)",
+            fontSize: "clamp(28px, 4vw, 38px)",
+            fontWeight: 400, color: "var(--s900)",
+            letterSpacing: "-0.025em", lineHeight: 1.1,
+            margin: "0 0 10px", fontStyle: "italic",
+          }}>
+            Ask anything.
+          </h1>
+          <p style={{
+            fontSize: "13.5px", color: "var(--s500)", lineHeight: 1.65,
+            margin: 0, letterSpacing: "-0.01em", fontWeight: 400,
+          }}>
+            Collections intelligence across invoices, customers, and revenue.
+          </p>
         </div>
-        <h1 style={{
-          fontFamily: "'Instrument Serif', Georgia, serif",
-          fontSize: "clamp(26px, 3vw, 36px)",
-          fontWeight: 400, color: "#111827",
-          letterSpacing: "-0.025em", lineHeight: 1.1, margin: "0 0 10px",
-        }}>
-          Ask <em style={{ fontStyle: "italic" }}>anything.</em>
-        </h1>
-        <p style={{
-          fontSize: "13.5px", color: "#6b7280", lineHeight: 1.65,
-          margin: "0 auto", maxWidth: 310, letterSpacing: "-0.01em",
-        }}>
-          Collections intelligence across invoices, customers, and revenue — live from your database.
-        </p>
-      </div>
 
-      <div style={{
-        width: "100%", maxWidth: 440,
-        display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6,
-      }} className="ch-fade-up">
-        {SUGGESTIONS.map((s, i) => (
-          <button
-            key={s.text}
-            className="ch-chip"
-            onClick={() => onSend(s.text)}
-            style={{ animationDelay: `${0.05 + i * 0.04}s` }}
-          >
-            <span style={{ fontSize: 13 }}>{s.icon}</span>
-            <span style={{ flex: 1 }}>{s.text}</span>
-          </button>
-        ))}
+        {/* Suggestions */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }} className="ch-fade-up">
+          {SUGGESTIONS.map((s, i) => (
+            <button
+              key={s.text}
+              className="ch-suggestion"
+              onClick={() => onSend(s.text)}
+              style={{ animationDelay: `${0.05 + i * 0.03}s` }}
+            >
+              <span>{s.text}</span>
+              <svg className="ch-suggestion-arrow" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M3 7h8M8 4l3 3-3 3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
 }
-
-// ─── Input bar ────────────────────────────────────────────────────────────────
 
 const QUICK = ["Who else is overdue?", "Revenue summary", "Top customers", "Recent invoices"];
 
@@ -782,35 +771,32 @@ function InputBar({ onSend, loading, hasMessages }: { onSend: (t: string) => voi
 
   return (
     <div style={{
-      borderTop: "1px solid #e5e7eb",
-      padding: "10px 24px 16px",
-      background: "#ffffff",
+      borderTop: "1px solid var(--s200)",
+      padding: "10px 24px 18px",
+      background: "var(--white)",
       flexShrink: 0,
     }}>
-      {/* Quick pill suggestions — shown after first message */}
       {hasMessages && !loading && (
-        <div style={{ display: "flex", gap: 6, marginBottom: 10, overflowX: "auto", paddingBottom: 2 }}>
+        <div style={{ display: "flex", gap: 5, marginBottom: 9, overflowX: "auto", paddingBottom: 1, maxWidth: 720, margin: "0 auto 9px" }}>
           {QUICK.map(s => (
             <button key={s} className="ch-pill" onClick={() => onSend(s)}>{s}</button>
           ))}
         </div>
       )}
 
-      {/* Input box — ChatGPT-style pill */}
       <div style={{ maxWidth: 720, margin: "0 auto" }}>
         <div
           className="ch-input-wrap"
           style={{
             display: "flex",
             alignItems: "flex-end",
-            gap: 10,
-            background: focused ? "#ffffff" : "#f9fafb",
-            borderRadius: 28,
-            padding: "10px 12px 10px 20px",
-            border: `1px solid ${focused ? "#9ca3af" : "#e5e7eb"}`,
+            gap: 8,
+            background: focused ? "var(--white)" : "var(--s50)",
+            borderRadius: 12,
+            padding: "10px 10px 10px 16px",
+            border: `1px solid ${focused ? "var(--s300)" : "var(--s200)"}`,
           }}
         >
-         
           <textarea
             ref={ref}
             className="ch-textarea"
@@ -819,13 +805,13 @@ function InputBar({ onSend, loading, hasMessages }: { onSend: (t: string) => voi
             onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
-            placeholder="Ask about customers, invoices, call priorities…"
+            placeholder="Ask about customers, invoices, priorities…"
             rows={1}
             style={{
               flex: 1, border: "none", background: "transparent",
-              fontSize: "14px", color: "#111827", lineHeight: 1.6,
+              fontSize: "13.5px", color: "var(--s900)", lineHeight: 1.65,
               fontFamily: "var(--sans)", maxHeight: 120, overflowY: "auto",
-              paddingTop: 4, letterSpacing: "-0.01em",
+              paddingTop: 2, letterSpacing: "-0.01em", fontWeight: 400,
             }}
             onInput={e => {
               const t = e.currentTarget;
@@ -834,33 +820,30 @@ function InputBar({ onSend, loading, hasMessages }: { onSend: (t: string) => voi
             }}
           />
 
-       
-
-          {/* Send button */}
           <button
             className="ch-send"
             onClick={send}
             disabled={!canSend}
             style={{
-              width: 34, height: 34, borderRadius: "50%", border: "none",
-              background: canSend ? "#111827" : "#e5e7eb",
+              width: 30, height: 30, borderRadius: 8, border: "none",
+              background: canSend ? "var(--s900)" : "var(--s100)",
               cursor: canSend ? "pointer" : "default",
               display: "flex", alignItems: "center", justifyContent: "center",
-              flexShrink: 0,
+              flexShrink: 0, transition: "background 0.15s",
             }}
           >
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path d="M7 12V2M3 6l4-4 4 4"
-                stroke={canSend ? "#ffffff" : "#9ca3af"}
-                strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M6 10V2M2.5 5.5L6 2l3.5 3.5"
+                stroke={canSend ? "#ffffff" : "var(--s400)"}
+                strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"
               />
             </svg>
           </button>
         </div>
 
         <p style={{
-          fontSize: "11px", color: "#9ca3af", textAlign: "center",
-          margin: "8px 0 0", letterSpacing: "-0.01em",
+          fontSize: "10.5px", color: "var(--s400)", textAlign: "center",
+          margin: "7px 0 0", letterSpacing: "-0.01em",
         }}>
           Enter to send · Shift+Enter for new line
         </p>
@@ -869,8 +852,6 @@ function InputBar({ onSend, loading, hasMessages }: { onSend: (t: string) => voi
   );
 }
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
-
 export default function Chat() {
   const dispatch = useDispatch<AppDispatch>();
   const { messages, loading } = useSelector((state: RootState) => state.chat);
@@ -878,22 +859,17 @@ export default function Chat() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
 
-  // Auto-scroll to bottom on new messages
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  // Show scroll-to-bottom button when user has scrolled up
   const handleScroll = () => {
     const el = scrollRef.current;
     if (!el) return;
-    const distFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
-    setShowScrollBtn(distFromBottom > 200);
+    setShowScrollBtn(el.scrollHeight - el.scrollTop - el.clientHeight > 200);
   };
 
-  const scrollToBottom = () => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  const scrollToBottom = () => bottomRef.current?.scrollIntoView({ behavior: "smooth" });
 
   const send = useCallback((text: string) => {
     const t = text.trim();
@@ -906,59 +882,41 @@ export default function Chat() {
   return (
     <div className="ch">
       <style>{css}</style>
-
-      {/* ── Fixed header ── */}
       <ChatHeader hasMessages={!isEmpty} onClear={() => dispatch(clearChat())} />
 
-      {/* ── Scrollable message area ── */}
       <div
         ref={scrollRef}
         className="ch-scroll"
         onScroll={handleScroll}
-        style={{
-          flex: 1,
-          overflowY: "auto",
-          display: "flex",
-          flexDirection: "column",
-        }}
+        style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column" }}
       >
         {isEmpty ? (
           <EmptyState onSend={send} />
         ) : (
           <div style={{
-            maxWidth: 720,
-            width: "100%",
-            margin: "0 auto",
+            maxWidth: 720, width: "100%", margin: "0 auto",
             padding: "32px 24px 24px",
-            display: "flex",
-            flexDirection: "column",
-            gap: 24,
+            display: "flex", flexDirection: "column", gap: 22,
           }}>
             {messages.map(msg => (
               <div key={msg.id} className="ch-msg-in">
                 {msg.role === "user" ? <UserBubble msg={msg} /> : <AssistantBubble msg={msg} />}
               </div>
             ))}
-            {loading && (
-              <div className="ch-msg-in">
-                <ThinkingBubble />
-              </div>
-            )}
+            {loading && <div className="ch-msg-in"><ThinkingBubble /></div>}
             <div ref={bottomRef} />
           </div>
         )}
       </div>
 
-      {/* Scroll-to-bottom button */}
       {showScrollBtn && !isEmpty && (
-        <button className="ch-scroll-btn" onClick={scrollToBottom} title="Scroll to bottom">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M7 2v10M3 8l4 4 4-4" stroke="#374151" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        <button className="ch-scroll-btn" onClick={scrollToBottom}>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M6 2v8M2.5 6.5L6 10l3.5-3.5" stroke="var(--s600)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </button>
       )}
 
-      {/* ── Fixed input bar ── */}
       <InputBar onSend={send} loading={loading} hasMessages={!isEmpty} />
     </div>
   );
