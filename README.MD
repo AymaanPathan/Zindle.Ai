@@ -1,5 +1,7 @@
 # Zindle.AI — Collections Intelligence Platform
-<img width="2868" height="1298" alt="Image" src="https://github.com/user-attachments/assets/2ad5fafc-cc0c-4894-a04a-1404c9ed816d" />
+
+<img width="2868" height="1298" alt="Zindle.AI hero" src="https://github.com/user-attachments/assets/2ad5fafc-cc0c-4894-a04a-1404c9ed816d" />
+
 > Most businesses don't have a collections problem. They have a visibility problem.
 
 Customer information lives in HubSpot. Invoices live in Stripe. Conversations live in email. Every time a payment gets delayed, teams jump between systems trying to understand what happened, what changed, and what to do next.
@@ -13,10 +15,10 @@ Customer information lives in HubSpot. Invoices live in Stripe. Conversations li
 ```
 Customer information  →  HubSpot
 Invoices             →  Stripe
-Conversations        →  Gmail / Slack
+Conversations        →  Gmail
 ```
 
-Instead of isolated invoices and disconnected records, Zindle gives your team a **living customer intelligence layer** powered by [Coral](https://github.com/coraldb) — joining all three data sources in real time.
+Instead of isolated invoices and disconnected records, Zindle gives your team a **living customer intelligence layer** powered by [Coral](https://withcoral.com/docs) — joining all three data sources in real time.
 
 ---
 
@@ -35,12 +37,10 @@ Instead of isolated invoices and disconnected records, Zindle gives your team a 
 ## Features
 
 ### 1. Dashboard — Visibility
-<img width="2868" height="1298" alt="Image" src="https://github.com/user-attachments/assets/e932c7e2-c6f9-4b80-8553-d69da53f05f9" />
-> _What's happening across my customer portfolio?_
 
-<!-- IMAGE PLACEHOLDER: Dashboard overview screenshot -->
-<!-- Place your dashboard screenshot here -->
-<!-- Example: ![Dashboard](./docs/images/dashboard.png) -->
+<img width="2868" height="1298" alt="Dashboard overview" src="https://github.com/user-attachments/assets/e932c7e2-c6f9-4b80-8553-d69da53f05f9" />
+
+> *What's happening across my customer portfolio?*
 
 Real-time portfolio health at a glance:
 
@@ -54,13 +54,10 @@ Every metric is computed from live Coral SQL joins across Stripe and HubSpot —
 ---
 
 ### 2. Invoice Journey Graph — Context
-<img width="2868" height="1298" alt="Image" src="https://github.com/user-attachments/assets/c115d3e5-b554-4fd1-b1fc-2788a32d19b2" />
 
-> _Why is this customer behaving this way?_
+<img width="2868" height="1298" alt="Invoice Journey Graph" src="https://github.com/user-attachments/assets/c115d3e5-b554-4fd1-b1fc-2788a32d19b2" />
 
-<!-- IMAGE PLACEHOLDER: Journey graph / flow view screenshot -->
-<!-- Place your Journey Flow screenshot here -->
-<!-- Example: ![Journey Flow](./docs/images/journey-flow.png) -->
+> *Why is this customer behaving this way?*
 
 Click any customer to open a full relationship timeline powered by Coral joins across CRM, email, and invoice systems.
 
@@ -82,35 +79,29 @@ Follow-up Sent
 Payment Received  /  Ghosted
 ```
 
-<!-- IMAGE PLACEHOLDER: Journey timeline view screenshot -->
-<!-- Place your Timeline screenshot here -->
-<!-- Example: ![Journey Timeline](./docs/images/journey-timeline.png) -->
-
 Every interaction becomes a node:
 
 - Invoice creation, send, open, click, payment
 - Email engagement (opened, clicked, bounced)
 - Payment behavior and history
-- Follow-ups and internal Slack mentions
+- Follow-ups and internal mentions
 - Risk spikes with timestamps
 
 Each node includes AI-generated insights, quick actions, and contextual recommendations:
 
-> _"Customer repeatedly opens invoices late at night."_
-> _"Historically responds better to direct calls."_
-> _"Engagement dropped after invoice amount increased."_
+> *"Customer repeatedly opens invoices late at night."*
+> *"Historically responds better to direct calls."*
+> *"Engagement dropped after invoice amount increased."*
 
 Two views available: **Flow** (ReactFlow graph) and **Timeline** (chronological list), both filterable by source — Stripe, Gmail, HubSpot.
 
 ---
 
 ### 3. Ask AI — Reasoning
-<img width="2868" height="1298" alt="Image" src="https://github.com/user-attachments/assets/3b321466-9939-415d-b9d7-f33f36075e2a" />
-> _What should I do?_
 
-<!-- IMAGE PLACEHOLDER: AI Chat screenshot -->
-<!-- Place your AI chat screenshot here -->
-<!-- Example: ![AI Chat](./docs/images/ai-chat.png) -->
+<img width="2868" height="1298" alt="AI Chat assistant" src="https://github.com/user-attachments/assets/3b321466-9939-415d-b9d7-f33f36075e2a" />
+
+> *What should I do?*
 
 The AI Collections Assistant answers operational questions in natural language. Ask it anything:
 
@@ -124,7 +115,7 @@ The AI Collections Assistant answers operational questions in natural language. 
 
 Internally, the agent runs Coral SQL joins across Stripe + HubSpot + Gmail in real time, then responds with prioritized recommendations:
 
-> _"Call Acme Corp first. $12,000 overdue, 18 days late. Last email opened but not replied 6 days ago. Historically responds best to direct calls."_
+> *"Call Acme Corp first. $12,000 overdue, 18 days late. Last email opened but not replied 6 days ago. Historically responds best to direct calls."*
 
 Intent classification routes each query to the right handler — no hallucinated data, every answer is grounded in live database results.
 
@@ -145,13 +136,10 @@ Intent classification routes each query to the right handler — no hallucinated
 ---
 
 ### 4. Activity — Execution
-<img width="2868" height="1298" alt="Image" src="https://github.com/user-attachments/assets/a3a64e4c-3155-416d-ae99-1a2aa2268d50" />
+
+<img width="2868" height="1298" alt="Activity view" src="https://github.com/user-attachments/assets/a3a64e4c-3155-416d-ae99-1a2aa2268d50" />
 
 The Activity view lists all clients as cards with real-time risk signals, outstanding balances, and lifecycle stage. Filter by risk level, search by name, sort by amount due.
-
-<!-- IMAGE PLACEHOLDER: Customer profile / invoice list screenshot -->
-<!-- Place your Customer Profile screenshot here -->
-<!-- Example: ![Customer Profile](./docs/images/customer-profile.png) -->
 
 Click any client to open their full profile:
 
@@ -159,10 +147,6 @@ Click any client to open their full profile:
 - Payment rate and collection metrics
 - Email communication history (HubSpot + Resend)
 - Risk level: `healthy` / `medium` / `high` / `critical`
-
-<!-- IMAGE PLACEHOLDER: Email draft / send screenshot -->
-<!-- Place your Email Generator screenshot here -->
-<!-- Example: ![Email Generator](./docs/images/email-draft.png) -->
 
 **AI Email Generator** — generate and send follow-up emails without leaving the app:
 
@@ -179,7 +163,7 @@ Emails are generated by LLM with account context (balance, history, engagement) 
 
 ## How Coral Powers This
 
-Zindle's entire data layer runs through [Coral](https://withcoral.com) — a single SQL interface that turns APIs and files into queryable tables. Instead of writing separate API clients for Stripe, HubSpot, and Gmail, we write one SQL query and Coral handles the rest.
+Zindle's entire data layer runs through [Coral](https://withcoral.com/docs) — a single SQL interface that turns APIs and files into queryable tables. Instead of writing separate API clients for Stripe, HubSpot, and Gmail, we write one SQL query and Coral handles the rest.
 
 ### The problem Coral solves here
 
@@ -216,11 +200,10 @@ Coral executes this locally on your machine — no data leaves, no external serv
 | **Stripe** | `stripe` | `invoices` | Invoice status, amounts, due dates, payment timestamps |
 | **HubSpot** | `hubspot` | `contacts`, `email_events` | Contact identity, lifecycle stage, CRM communication history |
 | **Gmail** | `gmail` | `messages` | Email threads, subjects, open/click engagement |
-| **Slack** | `slack` | `messages` | Internal team mentions, discussion context per customer |
 
 ### HubSpot — custom source spec
 
-HubSpot is not bundled in Coral by default. We connect it using a **custom source spec** — a YAML file that tells Coral how to authenticate against the HubSpot API and which tables to expose.
+HubSpot is not bundled in Coral by default. We connect it using a **[custom source spec](https://withcoral.com/docs/guides/write-a-custom-source)** — a YAML file that tells Coral how to authenticate against the HubSpot API and which tables to expose.
 
 ```bash
 # Add HubSpot as a custom Coral source
@@ -246,7 +229,7 @@ This join rule — **HubSpot is truth** — is enforced across every query in th
 
 ### Coral MCP — persistent stdio connection
 
-Coral exposes its query engine over MCP (Model Context Protocol) via stdio. The backend runs `coral mcp-stdio` as a child process and communicates through JSON-RPC:
+Coral exposes its query engine [over MCP](https://withcoral.com/docs/guides/use-coral-over-mcp) (Model Context Protocol) via stdio. The backend runs `coral mcp-stdio` as a child process and communicates through JSON-RPC:
 
 ```
 Backend (Node.js)
@@ -257,8 +240,7 @@ coral mcp-stdio  (local process)
       │
       ├── stripe.invoices    → Stripe API
       ├── hubspot.contacts   → HubSpot API  (custom source spec)
-      ├── gmail.messages     → Gmail API
-      └── slack.messages     → Slack API
+      └── gmail.messages     → Gmail API
 ```
 
 Rather than spawning a new `coral` process per query (which had cold-start overhead), we maintain a **persistent singleton** — initialized once on server startup, reused for every query:
@@ -348,9 +330,8 @@ LLM (Groq) → narrates the data, adds call openers
 │         coral mcp-stdio (local)          │
 │                                         │
 │  stripe.invoices     hubspot.contacts   │
-│  gmail.messages      slack.messages     │
-│  hubspot.email_events                   │
-└───────┬──────────┬──────────┬───────────┘
+│  gmail.messages      hubspot.email_events│
+└───────┬──────────┬──────────────────────┘
         │          │          │
    Stripe API  HubSpot API  Gmail API
   (bundled)   (custom spec) (bundled)
@@ -370,7 +351,7 @@ LLM (Groq) → narrates the data, adds call openers
 |-------|-----------|
 | Frontend | React, Redux Toolkit, ReactFlow, TypeScript |
 | Backend | Express, TypeScript, Node.js |
-| Database joins | Coral MCP (DuckDB SQL) |
+| Database joins | [Coral MCP](https://withcoral.com/docs/guides/use-coral-over-mcp) (DuckDB SQL) |
 | AI | Groq API — LLaMA 3.3 70B Versatile |
 | Email delivery | Resend |
 | CRM | HubSpot |
@@ -429,7 +410,7 @@ Zindle.AI/
 ### Prerequisites
 
 - Node.js 18+
-- [Coral CLI](https://withcoral.com) installed and configured
+- [Coral CLI](https://withcoral.com/docs) installed and configured
 - Stripe Private App token, HubSpot Private App token, Gmail configured
 
 ### 1. Install Coral
@@ -438,17 +419,16 @@ Zindle.AI/
 brew install withcoral/tap/coral
 ```
 
-See [all installation options](https://withcoral.com/docs/installation).
+See the [full installation guide](https://withcoral.com/docs).
 
 ### 2. Connect data sources
 
-Stripe and Gmail are bundled sources. HubSpot connects via a custom source spec included in this repo.
+Stripe and Gmail are bundled sources. HubSpot connects via a [custom source spec](https://withcoral.com/docs/guides/write-a-custom-source) included in this repo.
 
 ```bash
 # Bundled sources
 coral source add stripe
-coral source add gmail       # optional — enables email history
-coral source add slack       # optional — enables team pulse
+coral source add gmail       # enables email history
 
 # HubSpot — custom source spec (requires a HubSpot Private App token)
 coral source add --file ./hubspot-source.yaml --interactive
@@ -462,7 +442,7 @@ coral sql "SELECT email, lifecyclestage FROM hubspot.contacts LIMIT 5"
 coral sql "SELECT customer_email, status, amount_due FROM stripe.invoices LIMIT 5"
 ```
 
-### 2. Backend
+### 3. Backend
 
 ```bash
 cd backend
@@ -472,7 +452,7 @@ npm install
 npm run dev
 ```
 
-### 3. Frontend
+### 4. Frontend
 
 ```bash
 cd frontend
@@ -501,13 +481,15 @@ PORT=5000
 
 ## Key Design Decisions
 
-**Coral MCP as a persistent singleton** — The backend spawns a single `coral mcp-stdio` process on startup and reuses it for all queries. This eliminates the cold-start cost of spawning a new process per request, which was the previous approach.
+**Coral MCP as a persistent singleton** — The backend spawns a single `coral mcp-stdio` process on startup and reuses it for all queries. This eliminates the cold-start cost of spawning a new process per request. See [Use Coral over MCP](https://withcoral.com/docs/guides/use-coral-over-mcp).
 
 **Data-first, LLM-second** — Every AI response starts with a SQL query. The LLM only receives structured data and is asked to synthesize, rank, or narrate it. It never generates numbers or customer details from memory.
 
 **Intent classification before LLM** — A regex-based classifier routes queries to typed handlers before any LLM call. This makes common queries fast, deterministic, and cheap.
 
 **Risk scoring in TypeScript, not SQL** — Financial calculations (payment rate, overdue days, risk tier) happen in application code after data is fetched, not inside SQL. This keeps queries simple and math auditable.
+
+**HubSpot via custom source spec** — Since HubSpot isn't a bundled Coral source, we define it using a [custom source spec](https://withcoral.com/docs/guides/write-a-custom-source) in YAML. This keeps credentials local and makes `hubspot.contacts` a first-class SQL table.
 
 ---
 
@@ -546,13 +528,3 @@ PORT=5000
 3. Commit your changes: `git commit -m 'Add your feature'`
 4. Push to the branch: `git push origin feature/your-feature`
 5. Open a pull request
-
----
-
-## License
-
-MIT — see [LICENSE](./LICENSE) for details.
-
----
-
-<p align="center">Built with <a href="https://www.anthropic.com">Coral</a> · <a href="https://groq.com">Groq</a> · <a href="https://stripe.com">Stripe</a> · <a href="https://hubspot.com">HubSpot</a> · <a href="https://resend.com">Resend</a></p>
