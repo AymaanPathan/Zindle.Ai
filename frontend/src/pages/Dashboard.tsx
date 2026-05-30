@@ -11,10 +11,10 @@ const css = `
 
   .d {
     --w:    #ffffff;
-    --g50:  #f9fafb;
-    --g100: #f3f4f6;
-    --g200: #e5e7eb;
-    --g300: #d1d5db;
+    --g50:  #fafafa;
+    --g100: #f5f5f7;
+    --g200: #e8e8ed;
+    --g300: #d1d1d6;
     --g400: #9ca3af;
     --g500: #6b7280;
     --g600: #4b5563;
@@ -33,7 +33,7 @@ const css = `
   .d-bar {
     position: sticky; top: 0; z-index: 50;
     border-bottom: 1px solid var(--g200);
-    background: rgba(255,255,255,0.92);
+    background: rgba(255,255,255,0.94);
     backdrop-filter: blur(20px);
   }
   .d-bar-inner {
@@ -47,7 +47,7 @@ const css = `
 
   .d-search {
     display: flex; align-items: center; gap: 7px;
-    border: 1px solid var(--g200); border-radius: 8px;
+    border: 1px solid var(--g200); border-radius: 9px;
     padding: 6px 12px; background: var(--w); transition: all 0.15s;
     width: 220px;
   }
@@ -72,7 +72,7 @@ const css = `
   }
   .d-btn:hover { background: var(--g50); color: var(--g900); border-color: var(--g300); }
 
-  /* ── page body — full width, just padded ── */
+  /* ── page body ── */
   .d-body { padding: 36px 32px 64px; }
 
   /* ── heading ── */
@@ -93,7 +93,7 @@ const css = `
     margin: 0 0 28px;
   }
 
-  /* ── stat grid — 4 across, full width ── */
+  /* ── stat grid ── */
   .d-stats {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -101,44 +101,52 @@ const css = `
     margin-bottom: 24px;
   }
   .d-stat {
-    border: 1px solid var(--g200); border-radius: 12px;
-    padding: 18px 20px; background: var(--w);
+    border: 1px solid var(--g200); border-radius: 14px;
+    padding: 20px 22px; background: var(--w);
     transition: border-color 0.15s, box-shadow 0.15s; cursor: default;
   }
-  .d-stat:hover { border-color: var(--g300); box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
-  .d-stat-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .d-stat:hover {
+    border-color: var(--g300);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.05);
+  }
+  .d-stat-row {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;
+  }
   .d-stat-label {
     font-size: 10px; font-weight: 600; color: var(--g400);
     text-transform: uppercase; letter-spacing: 0.1em;
   }
   .d-stat-icon {
-    width: 24px; height: 24px; border-radius: 6px;
-    border: 1px solid var(--g200); background: var(--g50);
+    width: 26px; height: 26px; border-radius: 7px;
+    border: 1px solid var(--g200); background: var(--w);
     display: flex; align-items: center; justify-content: center;
-    font-size: 10px; color: var(--g500);
+    font-size: 11px; color: var(--g500);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   }
   .d-stat-val {
     font-family: var(--serif);
     font-size: 32px; font-weight: 400; color: var(--g900);
     margin: 0; line-height: 1; letter-spacing: -0.02em;
   }
-  .d-stat-hint { font-size: 11px; color: var(--g400); margin: 5px 0 0; }
+  .d-stat-hint { font-size: 11px; color: var(--g400); margin: 6px 0 0; }
 
   /* ── table card ── */
   .d-card {
-    border: 1px solid var(--g200); border-radius: 14px;
+    border: 1px solid var(--g200); border-radius: 16px;
     overflow: hidden; background: var(--w);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03), 0 4px 20px rgba(0,0,0,0.03);
   }
   .d-card-top {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 13px 20px; border-bottom: 1px solid var(--g200);
+    padding: 14px 22px; border-bottom: 1px solid var(--g200);
+    background: var(--w);
   }
   .d-card-top-l { display: flex; align-items: center; gap: 8px; }
   .d-card-title { font-size: 13px; font-weight: 600; color: var(--g900); letter-spacing: -0.02em; }
   .d-count {
     font-size: 11px; font-weight: 500; color: var(--g500);
-    background: var(--g100); border: 1px solid var(--g200);
-    padding: 1px 8px; border-radius: 100px;
+    background: var(--w); border: 1px solid var(--g200);
+    padding: 1px 9px; border-radius: 100px;
   }
   .d-card-hint { font-size: 11.5px; color: var(--g400); letter-spacing: -0.01em; }
 
@@ -146,7 +154,7 @@ const css = `
   .d-tbl { width: 100%; border-collapse: collapse; }
 
   .d-tbl thead tr {
-    background: var(--g50);
+    background: var(--w);
     border-bottom: 1px solid var(--g200);
   }
   .d-tbl thead th {
@@ -158,7 +166,7 @@ const css = `
   .d-tbl thead th:last-child { text-align: right; }
 
   .d-tbl tbody tr {
-    border-bottom: 1px solid var(--g100);
+    border-bottom: 1px solid var(--g200);
     cursor: pointer; transition: background 0.08s;
   }
   .d-tbl tbody tr:last-child { border-bottom: none; }
@@ -173,24 +181,25 @@ const css = `
   /* ── avatar ── */
   .d-av {
     width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
-    background: var(--g100); border: 1px solid var(--g200);
+    background: var(--w); border: 1px solid var(--g200);
     display: flex; align-items: center; justify-content: center;
     font-size: 10.5px; font-weight: 600; color: var(--g700);
     letter-spacing: 0.02em; font-family: var(--sans);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
   }
 
   /* ── cell styles ── */
-  .d-cname { font-size: 13px; font-weight: 500; color: var(--g900); margin: 0; letter-spacing: -0.015em; }
+  .d-cname  { font-size: 13px; font-weight: 500; color: var(--g900); margin: 0; letter-spacing: -0.015em; }
   .d-cemail { font-size: 11px; color: var(--g400); margin: 2px 0 0; letter-spacing: -0.01em; }
-  .d-clc { font-size: 12.5px; color: var(--g500); text-transform: capitalize; letter-spacing: -0.01em; }
-  .d-cinv { font-size: 13px; color: var(--g600); font-variant-numeric: tabular-nums; }
-  .d-camt { font-size: 13px; font-weight: 600; color: var(--g900); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+  .d-clc    { font-size: 12.5px; color: var(--g500); text-transform: capitalize; letter-spacing: -0.01em; }
+  .d-cinv   { font-size: 13px; color: var(--g600); font-variant-numeric: tabular-nums; }
+  .d-camt   { font-size: 13px; font-weight: 600; color: var(--g900); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
 
   /* ── risk ── */
   .d-risk { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; letter-spacing: -0.01em; }
   .d-rdot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
 
-  /* ── open btn — invisible until row hover ── */
+  /* ── open btn ── */
   .d-open {
     display: inline-flex; align-items: center; gap: 5px;
     padding: 5px 12px; border-radius: 7px;
@@ -223,7 +232,6 @@ function fmtK(c: number, currency = "INR") {
   return new Intl.NumberFormat("en-IN", { style: "currency", currency, notation: "compact", maximumFractionDigits: 1 }).format(c / 100);
 }
 
-// Replace the entire Risk component:
 function Risk({ client }: { client: Client }) {
   if (client.isFullyPaid || client.riskLevel === "healthy") {
     return (
@@ -256,6 +264,7 @@ function Risk({ client }: { client: Client }) {
     </span>
   );
 }
+
 export default function Dashboard() {
   const dispatch = useDispatch<AppDispatch>();
   const { list: clients, loading, error } = useSelector((s: RootState) => s.clients);
@@ -263,9 +272,9 @@ export default function Dashboard() {
 
   useEffect(() => { dispatch(loadClients()); }, [dispatch]);
 
-  const totalDue = clients.reduce((s, c) => s + c.totalDue, 0);
-  const highRisk = clients.filter(c => c.riskLevel === "high" || c.riskLevel === "critical").length;
-  const paid = clients.reduce((s, c) => s + c.paidInvoiceCount, 0);
+  const totalDue  = clients.reduce((s, c) => s + c.totalDue, 0);
+  const highRisk  = clients.filter(c => c.riskLevel === "high" || c.riskLevel === "critical").length;
+  const paid      = clients.reduce((s, c) => s + c.paidInvoiceCount, 0);
 
   const filtered = clients.filter((c) =>
     c.name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -276,9 +285,6 @@ export default function Dashboard() {
     <div className="d">
       <style>{css}</style>
 
-  
-
-      {/* ── Body — full width ── */}
       <div className="d-body">
 
         {/* Heading */}
@@ -291,11 +297,10 @@ export default function Dashboard() {
         {/* Stats */}
         <div className="d-stats">
           {[
-            { label: "Outstanding",   val: fmtK(totalDue, "INR"),         hint: `${clients.length} clients`,  icon: "$" },
-            { label: "High Risk",     val: String(highRisk),        hint: "need attention",             icon: "⚠" },
-            { label: "Total Clients", val: String(clients.length),  hint: "tracked accounts",           icon: "◫" },
-           { label: "Paid Invoices", val: String(paid), hint: "across all clients", icon: "✓" },
-
+            { label: "Outstanding",   val: fmtK(totalDue, "INR"),        hint: `${clients.length} clients`,   icon: "₹" },
+            { label: "High Risk",     val: String(highRisk),              hint: "need attention",              icon: "⚠" },
+            { label: "Total Clients", val: String(clients.length),        hint: "tracked accounts",            icon: "◫" },
+            { label: "Paid Invoices", val: String(paid),                  hint: "across all clients",          icon: "✓" },
           ].map(({ label, val, hint, icon }) => (
             <div className="d-stat" key={label}>
               <div className="d-stat-row">
@@ -308,14 +313,28 @@ export default function Dashboard() {
           ))}
         </div>
 
-       
+        {/* Table card */}
         <div className="d-card">
           <div className="d-card-top">
             <div className="d-card-top-l">
               <span className="d-card-title">Client Accounts</span>
               <span className="d-count">{filtered.length}</span>
             </div>
-            <span className="d-card-hint">Click any row to open journey →</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              {/* inline search in header */}
+              <div className="d-search" style={{ width: 200 }}>
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                  <circle cx="6" cy="6" r="4.5" stroke="#9ca3af" strokeWidth="1.3"/>
+                  <path d="M9.5 9.5L12 12" stroke="#9ca3af" strokeWidth="1.3" strokeLinecap="round"/>
+                </svg>
+                <input
+                  placeholder="Search clients…"
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                />
+              </div>
+              <span className="d-card-hint">Click any row to open journey →</span>
+            </div>
           </div>
 
           {loading && (
@@ -373,8 +392,8 @@ export default function Dashboard() {
                     {/* Invoices */}
                     <td><span className="d-cinv">{client.invoiceCount}</span></td>
 
-                    {/* Amount */}
-                  <span className="d-camt">{fmt(client.totalDue, (client as any).currency ?? "INR")}</span>
+                    {/* Amount — fixed: now properly wrapped in <td> */}
+                    <td><span className="d-camt">{fmt(client.totalDue, (client as any).currency ?? "INR")}</span></td>
 
                     {/* Risk */}
                     <td><Risk client={client} /></td>

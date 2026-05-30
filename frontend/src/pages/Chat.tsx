@@ -11,10 +11,10 @@ const css = `
 
   .ch {
     --white:  #ffffff;
-    --bg:     #fafafa;
-    --s50:    #f7f7f8;
-    --s100:   #f0f0f2;
-    --s200:   #e4e4e8;
+    --bg:     #ffffff;
+    --s50:    #f9f9fb;
+    --s100:   #f2f2f5;
+    --s200:   #e6e6ea;
     --s300:   #d0d0d6;
     --s400:   #a0a0ab;
     --s500:   #70707a;
@@ -73,55 +73,56 @@ const css = `
     50%      { opacity: 0.4; }
   }
 
-  .ch-msg-in  { animation: ch-in 0.2s cubic-bezier(0.16,1,0.3,1) both; }
+  .ch-msg-in  { animation: ch-in 0.22s cubic-bezier(0.16,1,0.3,1) both; }
   .ch-fade-up { animation: ch-up 0.4s cubic-bezier(0.16,1,0.3,1) both; }
   .ch-slide   { animation: ch-slide 0.16s ease both; }
 
   .ch-suggestion {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 11px 15px; border-radius: 8px;
+    padding: 11px 15px; border-radius: 10px;
     border: 1px solid var(--s200); background: var(--white);
     cursor: pointer; font-family: var(--sans);
     font-size: 13px; font-weight: 400; color: var(--s600);
     letter-spacing: -0.01em; text-align: left; width: 100%;
-    transition: border-color 0.12s, background 0.12s, color 0.12s;
+    transition: border-color 0.12s, background 0.12s, color 0.12s, box-shadow 0.12s;
     gap: 8px;
   }
   .ch-suggestion:hover {
     background: var(--s50); border-color: var(--s300); color: var(--s900);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   }
   .ch-suggestion-arrow {
     color: var(--s300); font-size: 12px; flex-shrink: 0;
     transition: color 0.12s, transform 0.12s;
   }
   .ch-suggestion:hover .ch-suggestion-arrow {
-    color: var(--s600); transform: translateX(2px);
+    color: var(--s500); transform: translateX(2px);
   }
 
   .ch-send { transition: opacity 0.1s, transform 0.1s; }
   .ch-send:hover:not(:disabled) { opacity: 0.85; }
-  .ch-send:active:not(:disabled) { transform: scale(0.94); }
+  .ch-send:active:not(:disabled) { transform: scale(0.93); }
 
   .ch-input-wrap { transition: border-color 0.15s, box-shadow 0.15s; }
   .ch-input-wrap:focus-within {
-    border-color: var(--s400) !important;
-    box-shadow: 0 0 0 3px rgba(15,15,20,0.06);
+    border-color: var(--s300) !important;
+    box-shadow: 0 0 0 3px rgba(15,15,20,0.05);
   }
 
   .ch-pill {
     display: inline-flex; align-items: center;
-    padding: 5px 12px; border-radius: 6px;
+    padding: 5px 12px; border-radius: 20px;
     border: 1px solid var(--s200); background: var(--white);
     font-size: 12px; font-weight: 400; color: var(--s500);
     cursor: pointer; font-family: var(--sans);
-    letter-spacing: -0.01em; transition: all 0.1s;
+    letter-spacing: -0.01em; transition: all 0.12s;
     white-space: nowrap; flex-shrink: 0;
   }
   .ch-pill:hover { background: var(--s50); color: var(--s900); border-color: var(--s300); }
 
-  .ch-code { background: var(--s900); border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.06); }
+  .ch-code { background: #0f0f14; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.06); }
   .ch-code-header {
-    padding: 8px 14px; background: rgba(255,255,255,0.04);
+    padding: 8px 14px; background: rgba(255,255,255,0.03);
     border-bottom: 1px solid rgba(255,255,255,0.06);
     display: flex; align-items: center; justify-content: space-between;
   }
@@ -137,10 +138,10 @@ const css = `
   }
   .ch-copy-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
 
-  .ch-table-wrap { border-radius: 8px; overflow: hidden; border: 1px solid var(--s200); }
+  .ch-table-wrap { border-radius: 10px; overflow: hidden; border: 1px solid var(--s200); }
   .ch-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
   .ch-table th {
-    padding: 9px 14px; text-align: left; font-size: 10.5px; font-weight: 500;
+    padding: 9px 14px; text-align: left; font-size: 10.5px; font-weight: 600;
     color: var(--s400); text-transform: uppercase; letter-spacing: 0.07em;
     background: var(--s50); border-bottom: 1px solid var(--s200);
   }
@@ -153,12 +154,12 @@ const css = `
 
   .ch-stat {
     background: var(--white); border: 1px solid var(--s200);
-    border-radius: 8px; padding: 14px 16px;
+    border-radius: 10px; padding: 16px 18px;
   }
 
   .ch-rank {
     display: flex; align-items: flex-start; gap: 12px;
-    padding: 11px 0; border-bottom: 1px solid var(--s100);
+    padding: 12px 0; border-bottom: 1px solid var(--s100);
   }
   .ch-rank:first-child { padding-top: 0; }
   .ch-rank:last-child  { border-bottom: none; padding-bottom: 0; }
@@ -166,17 +167,17 @@ const css = `
   .ch-action-item {
     display: flex; align-items: flex-start; gap: 10px;
     background: var(--white); border: 1px solid var(--s200);
-    border-radius: 7px; padding: 9px 12px;
+    border-radius: 8px; padding: 10px 13px;
   }
 
   .ch-insight {
     display: flex; gap: 10px; align-items: flex-start;
-    padding: 11px 14px; border-radius: 7px; border: 1px solid;
+    padding: 12px 14px; border-radius: 9px; border: 1px solid;
   }
 
   .ch-card {
     background: var(--white); border: 1px solid var(--s200);
-    border-radius: 10px; overflow: hidden;
+    border-radius: 12px; overflow: hidden;
   }
   .ch-card-header {
     padding: 10px 16px; background: var(--s50);
@@ -202,10 +203,10 @@ const css = `
   }
 
   .ch-clear-btn {
-    background: none; border: 1px solid var(--s200); border-radius: 6px;
-    padding: 5px 11px; cursor: pointer; font-size: 11.5px;
+    background: none; border: 1px solid var(--s200); border-radius: 7px;
+    padding: 5px 12px; cursor: pointer; font-size: 11.5px;
     color: var(--s500); font-family: var(--sans); letter-spacing: -0.01em;
-    transition: all 0.1s; font-weight: 400;
+    transition: all 0.12s; font-weight: 400;
   }
   .ch-clear-btn:hover { border-color: var(--s300); color: var(--s900); background: var(--s50); }
 
@@ -214,6 +215,15 @@ const css = `
     color: var(--s900); letter-spacing: -0.03em;
   }
   .ch-wordmark span { color: var(--s400); font-weight: 400; }
+
+  /* Assistant bubble — pure white, very light border + subtle shadow */
+  .ch-assistant-bubble {
+    background: var(--white);
+    border: 1px solid var(--s200);
+    border-radius: 3px 14px 14px 14px;
+    padding: 16px 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03);
+  }
 `;
 
 function fmtTime(iso: string) {
@@ -236,19 +246,20 @@ function LogoMark({ size = 24 }: { size?: number }) {
 
 function ThinkingBubble() {
   return (
-    <div style={{ display: "flex", gap: 11, alignItems: "flex-start", paddingLeft: 0 }}>
+    <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
       <div style={{ paddingTop: 2, flexShrink: 0 }}>
         <LogoMark size={22} />
       </div>
       <div style={{
-        padding: "10px 14px", borderRadius: "4px 12px 12px 12px",
-        background: "var(--s50)", border: "1px solid var(--s200)",
-        display: "flex", gap: 4, alignItems: "center",
+        padding: "11px 16px", borderRadius: "3px 14px 14px 14px",
+        background: "var(--white)", border: "1px solid var(--s200)",
+        boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+        display: "flex", gap: 5, alignItems: "center",
       }}>
         {[0, 1, 2].map(i => (
           <span key={i} style={{
             display: "inline-block", width: 4, height: 4, borderRadius: "50%",
-            background: "var(--s400)",
+            background: "var(--s300)",
             animation: `ch-dot 1.1s ease-in-out ${i * 0.18}s infinite`,
           }} />
         ))}
@@ -303,6 +314,8 @@ function parseBlocks(text: string): Block[] {
     const raw = lines[i];
     const line = raw.trim();
     if (!line) { i++; continue; }
+
+    // Code fence
     if (/^```/.test(line)) {
       const lang = line.slice(3).trim() || "text";
       const codeLines: string[] = [];
@@ -311,16 +324,26 @@ function parseBlocks(text: string): Block[] {
       blocks.push({ type: "code", lang, code: codeLines.join("\n") });
       i++; continue;
     }
+
+    // Headings
     const hm = line.match(/^(#{1,3})\s+(.*)/);
     if (hm) { blocks.push({ type: "heading", level: hm[1].length as 1|2|3, text: hm[2].replace(/\*+/g, "") }); i++; continue; }
-    if (/^\*{2}[^*]{2,50}\*{2}$/.test(line) && line.length < 60) { blocks.push({ type: "heading", level: 2, text: line.replace(/\*+/g, "") }); i++; continue; }
+    if (/^\*{2}[^*]{2,50}\*{2}$/.test(line) && line.length < 60) {
+      blocks.push({ type: "heading", level: 2, text: line.replace(/\*+/g, "") }); i++; continue;
+    }
+
+    // Markdown table
     if (line.startsWith("|") && lines[i+1]?.trim().startsWith("|--")) {
       const headers = line.split("|").map(c => c.trim()).filter(Boolean);
       const rows: string[][] = [];
       i += 2;
-      while (i < lines.length && lines[i].trim().startsWith("|")) { rows.push(lines[i].split("|").map(c => c.trim()).filter(Boolean)); i++; }
+      while (i < lines.length && lines[i].trim().startsWith("|")) {
+        rows.push(lines[i].split("|").map(c => c.trim()).filter(Boolean)); i++;
+      }
       blocks.push({ type: "table", headers, rows }); continue;
     }
+
+    // Numbered list — try ranked first
     if (/^\d+[.)]\s/.test(line)) {
       const items: RankItem[] = [];
       while (i < lines.length && /^\d+[.)]\s/.test(lines[i].trim())) {
@@ -332,11 +355,23 @@ function parseBlocks(text: string): Block[] {
         const amount = parseAmt(body);
         const noteM = body.match(/[—–]\s*(.+)$/);
         const note = noteM ? noteM[1].replace(/\*+/g, "").trim() : undefined;
-        items.push({ rank, name, amount, tag: tag?.tag, tagColor: tag?.color, note, progress: Math.max(12, 100 - (rank - 1) * 14) });
+        items.push({
+          rank, name, amount,
+          tag: tag?.tag, tagColor: tag?.color, note,
+          progress: Math.max(12, 100 - (rank - 1) * 14),
+        });
         i++;
       }
-      blocks.push({ type: "ranked", items }); continue;
+      // If items have amounts or tags, use ranked card; else plain numbered
+      if (items.some(it => it.amount || it.tag)) {
+        blocks.push({ type: "ranked", items });
+      } else {
+        blocks.push({ type: "numbered", items: items.map(it => it.name + (it.note ? ` — ${it.note}` : "")) });
+      }
+      continue;
     }
+
+    // Bullet list
     if (/^[-•*]\s/.test(line)) {
       const bLines: string[] = [];
       while (i < lines.length && /^[-•*]\s/.test(lines[i].trim())) { bLines.push(lines[i].trim()); i++; }
@@ -364,11 +399,41 @@ function parseBlocks(text: string): Block[] {
       }
       continue;
     }
+
+    // Insight / callout line
     if (/^[⚠✅💡🔴🟡🟢❌►→]|^\*?Note:|^\*?Warning:|^\*?Insight:|^\*?Summary:|^\*?Recommendation:/i.test(line)) {
       const cleaned = line.replace(/^[⚠✅💡🔴🟡🟢❌►→]\s*/, "").replace(/\*+/g, "");
       blocks.push({ type: "insight", variant: insightVariant(line), text: cleaned });
       i++; continue;
     }
+
+    // Plain sentence that looks like a key: value stat (e.g. "Collection rate: 48.3%.")
+    const inlineStat = line.match(/^([^:]{3,40}):\s*(.{1,60})\.?\s*$/);
+    if (inlineStat && /[\d%₹$£€]/.test(inlineStat[2]) && !line.startsWith("|")) {
+      // collect consecutive stat-like sentences
+      const stats: { label: string; value: string; accent?: string }[] = [];
+      let j = i;
+      while (j < lines.length) {
+        const ll = lines[j].trim();
+        if (!ll) { j++; break; }
+        const sm = ll.match(/^([^:]{3,50}):\s*(.{1,80})\.?\s*$/);
+        if (sm && /[\d%₹$£€]/.test(sm[2])) {
+          const label = sm[1].replace(/\*+/g, "").trim();
+          const value = sm[2].replace(/\*+/g, "").replace(/\.$/, "").trim();
+          let accent: string | undefined;
+          if (/paid|collected|success/i.test(label)) accent = "#16a34a";
+          else if (/outstanding|overdue|due/i.test(label)) accent = "#d97706";
+          else if (/risk|churn/i.test(label)) accent = "#dc2626";
+          stats.push({ label, value, accent });
+          j++;
+        } else break;
+      }
+      if (stats.length >= 2) {
+        blocks.push({ type: "stats", items: stats });
+        i = j; continue;
+      }
+    }
+
     blocks.push({ type: "paragraph", text: line });
     i++;
   }
@@ -391,15 +456,15 @@ function Inline({ text }: { text: string }) {
 }
 
 function HeadingBlock({ level, text }: { level: 1|2|3; text: string }) {
-  const sizes = { 1: "19px", 2: "14.5px", 3: "13px" };
+  const sizes: Record<number, string> = { 1: "20px", 2: "14.5px", 3: "13px" };
   return (
     <div style={{
       fontFamily: level === 1 ? "var(--serif)" : "var(--sans)",
       fontSize: sizes[level],
       fontWeight: level === 1 ? 400 : 600,
       color: "var(--s900)",
-      letterSpacing: level === 1 ? "-0.02em" : "-0.02em",
-      lineHeight: 1.25,
+      letterSpacing: "-0.02em",
+      lineHeight: 1.2,
       paddingBottom: level < 3 ? 8 : 0,
       borderBottom: level === 1 ? "1px solid var(--s200)" : "none",
       fontStyle: level === 1 ? "italic" : "normal",
@@ -419,10 +484,10 @@ function ParagraphBlock({ text }: { text: string }) {
 
 function BulletBlock({ items }: { items: string[] }) {
   return (
-    <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 5 }}>
+    <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 6 }}>
       {items.map((item, i) => (
         <li key={i} style={{ display: "flex", gap: 10, fontSize: "13px", color: "var(--s600)", lineHeight: 1.65 }}>
-          <span style={{ color: "var(--s300)", flexShrink: 0, marginTop: 7, width: 4, height: 4, borderRadius: "50%", background: "var(--s300)", display: "inline-block" }} />
+          <span style={{ color: "var(--s300)", flexShrink: 0, marginTop: 8, width: 4, height: 4, borderRadius: "50%", background: "var(--s300)", display: "inline-block" }} />
           <Inline text={item} />
         </li>
       ))}
@@ -432,7 +497,7 @@ function BulletBlock({ items }: { items: string[] }) {
 
 function NumberedBlock({ items }: { items: string[] }) {
   return (
-    <ol style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 5 }}>
+    <ol style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 6 }}>
       {items.map((item, i) => (
         <li key={i} style={{ display: "flex", gap: 10, fontSize: "13px", color: "var(--s600)", lineHeight: 1.65 }}>
           <span style={{
@@ -476,11 +541,12 @@ function TableBlock({ headers, rows }: { headers: string[]; rows: string[][] }) 
 }
 
 function StatsBlock({ items }: { items: { label: string; value: string; accent?: string }[] }) {
+  const cols = Math.min(items.length, 3);
   return (
-    <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(items.length, 3)}, 1fr)`, gap: 8 }}>
+    <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 8 }}>
       {items.map((s, i) => (
         <div key={i} className="ch-stat">
-          <div style={{ fontSize: "10px", fontWeight: 500, color: "var(--s400)", textTransform: "uppercase", letterSpacing: "0.09em", marginBottom: 8 }}>
+          <div style={{ fontSize: "10px", fontWeight: 600, color: "var(--s400)", textTransform: "uppercase", letterSpacing: "0.09em", marginBottom: 10 }}>
             {s.label}
           </div>
           <div style={{ fontFamily: "var(--serif)", fontSize: "22px", fontWeight: 400, color: s.accent || "var(--s900)", letterSpacing: "-0.02em", lineHeight: 1, fontStyle: "italic" }}>
@@ -521,11 +587,11 @@ function RankedBlock({ items }: { items: RankItem[] }) {
                 <span style={{ fontSize: "13px", fontWeight: 500, color: "var(--s900)", letterSpacing: "-0.015em" }}>{item.name}</span>
                 {item.tag && (
                   <span style={{
-                    fontSize: "10px", fontWeight: 500, padding: "1px 7px", borderRadius: 4,
-                    letterSpacing: "0.03em",
-                    background: (item.tagColor || "#4a4a55") + "12",
+                    fontSize: "10px", fontWeight: 500, padding: "2px 7px", borderRadius: 5,
+                    letterSpacing: "0.02em",
+                    background: (item.tagColor || "#4a4a55") + "14",
                     color: item.tagColor || "var(--s600)",
-                    border: `1px solid ${(item.tagColor || "#4a4a55") + "22"}`,
+                    border: `1px solid ${(item.tagColor || "#4a4a55") + "28"}`,
                   }}>
                     {item.tag}
                   </span>
@@ -539,7 +605,7 @@ function RankedBlock({ items }: { items: RankItem[] }) {
               {item.note && <div style={{ fontSize: "11.5px", color: "var(--s400)", marginTop: 3, lineHeight: 1.5 }}>{item.note}</div>}
               {item.progress !== undefined && (
                 <div style={{ height: 2, borderRadius: 99, background: "var(--s100)", marginTop: 8, overflow: "hidden" }}>
-                  <div style={{ height: "100%", borderRadius: 99, width: `${item.progress}%`, background: "var(--s300)", transition: "width 0.5s ease" }} />
+                  <div style={{ height: "100%", borderRadius: 99, width: `${item.progress}%`, background: "var(--s200)", transition: "width 0.5s ease" }} />
                 </div>
               )}
             </div>
@@ -555,12 +621,12 @@ function InsightBlock({ variant, text }: { variant: string; text: string }) {
     warning: { bg: "#fffbeb", border: "#fde68a", accent: "#d97706", label: "Warning" },
     success: { bg: "#f0fdf4", border: "#bbf7d0", accent: "#16a34a", label: "Note" },
     danger:  { bg: "#fef2f2", border: "#fecaca", accent: "#dc2626", label: "Alert" },
-    info:    { bg: "#eff6ff", border: "#bfdbfe", accent: "#2563eb", label: "Info" },
+    info:    { bg: "#f0f7ff", border: "#bfdbfe", accent: "#2563eb", label: "Info" },
   };
   const c = map[variant] || map.info;
   return (
     <div className="ch-insight" style={{ background: c.bg, borderColor: c.border }}>
-      <span style={{ fontSize: "10px", fontWeight: 600, color: c.accent, flexShrink: 0, lineHeight: 1.9, letterSpacing: "0.06em", textTransform: "uppercase" }}>{c.label}</span>
+      <span style={{ fontSize: "10px", fontWeight: 700, color: c.accent, flexShrink: 0, lineHeight: 1.9, letterSpacing: "0.07em", textTransform: "uppercase" }}>{c.label}</span>
       <span style={{ fontSize: "13px", color: "var(--s700)", lineHeight: 1.65, letterSpacing: "-0.01em" }}>
         <Inline text={text} />
       </span>
@@ -570,7 +636,7 @@ function InsightBlock({ variant, text }: { variant: string; text: string }) {
 
 function ActionsBlock({ items }: { items: string[] }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
       {items.map((item, i) => (
         <div key={i} className="ch-action-item">
           <div style={{
@@ -590,7 +656,7 @@ function ActionsBlock({ items }: { items: string[] }) {
 function ResponseRenderer({ text }: { text: string }) {
   const blocks = parseBlocks(text);
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       {blocks.map((block, i) => {
         switch (block.type) {
           case "heading":   return <HeadingBlock key={i} level={block.level} text={block.text} />;
@@ -613,7 +679,7 @@ function ResponseRenderer({ text }: { text: string }) {
 function UserBubble({ msg }: { msg: ChatMessage }) {
   return (
     <div style={{ display: "flex", justifyContent: "flex-end" }}>
-      <div style={{ maxWidth: "68%", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+      <div style={{ maxWidth: "68%", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 5 }}>
         <div style={{
           padding: "10px 16px",
           borderRadius: "14px 3px 14px 14px",
@@ -636,17 +702,12 @@ function UserBubble({ msg }: { msg: ChatMessage }) {
 
 function AssistantBubble({ msg }: { msg: ChatMessage }) {
   return (
-    <div style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
-      <div style={{ paddingTop: 2, flexShrink: 0 }}>
+    <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+      <div style={{ paddingTop: 3, flexShrink: 0 }}>
         <LogoMark size={22} />
       </div>
-      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 5 }}>
-        <div style={{
-          background: "var(--s50)",
-          border: "1px solid var(--s200)",
-          borderRadius: "3px 14px 14px 14px",
-          padding: "14px 18px",
-        }}>
+      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 6 }}>
+        <div className="ch-assistant-bubble">
           <ResponseRenderer text={msg.text} />
         </div>
         <span style={{ fontSize: "10px", color: "var(--s400)", paddingLeft: 2, fontVariantNumeric: "tabular-nums" }}>
@@ -672,7 +733,7 @@ function ChatHeader({ hasMessages, onClear }: { hasMessages: boolean; onClear: (
         <span className="ch-wordmark">Collections<span> AI</span></span>
         <div style={{
           display: "flex", alignItems: "center", gap: 5,
-          padding: "3px 8px", borderRadius: 5,
+          padding: "3px 9px", borderRadius: 6,
           background: "var(--s50)", border: "1px solid var(--s200)",
         }}>
           <span className="ch-status-dot" />
@@ -708,7 +769,6 @@ function EmptyState({ onSend }: { onSend: (t: string) => void }) {
       padding: "48px 32px 24px",
     }}>
       <div style={{ width: "100%", maxWidth: 460 }}>
-        {/* Heading */}
         <div className="ch-fade-up" style={{ marginBottom: 32 }}>
           <div style={{ marginBottom: 16 }}>
             <LogoMark size={32} />
@@ -730,8 +790,7 @@ function EmptyState({ onSend }: { onSend: (t: string) => void }) {
           </p>
         </div>
 
-        {/* Suggestions */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }} className="ch-fade-up">
+        <div style={{ display: "flex", flexDirection: "column", gap: 5 }} className="ch-fade-up">
           {SUGGESTIONS.map((s, i) => (
             <button
               key={s.text}
@@ -792,7 +851,7 @@ function InputBar({ onSend, loading, hasMessages }: { onSend: (t: string) => voi
             alignItems: "flex-end",
             gap: 8,
             background: focused ? "var(--white)" : "var(--s50)",
-            borderRadius: 12,
+            borderRadius: 14,
             padding: "10px 10px 10px 16px",
             border: `1px solid ${focused ? "var(--s300)" : "var(--s200)"}`,
           }}
@@ -825,7 +884,7 @@ function InputBar({ onSend, loading, hasMessages }: { onSend: (t: string) => voi
             onClick={send}
             disabled={!canSend}
             style={{
-              width: 30, height: 30, borderRadius: 8, border: "none",
+              width: 32, height: 32, borderRadius: 9, border: "none",
               background: canSend ? "var(--s900)" : "var(--s100)",
               cursor: canSend ? "pointer" : "default",
               display: "flex", alignItems: "center", justifyContent: "center",
@@ -896,7 +955,7 @@ export default function Chat() {
           <div style={{
             maxWidth: 720, width: "100%", margin: "0 auto",
             padding: "32px 24px 24px",
-            display: "flex", flexDirection: "column", gap: 22,
+            display: "flex", flexDirection: "column", gap: 24,
           }}>
             {messages.map(msg => (
               <div key={msg.id} className="ch-msg-in">

@@ -6,15 +6,9 @@ import { setTab } from "../store/slices/uiSlice";
 type Tab = "clients" | "activity" | "chat";
 
 const NAV: { id: Tab; label: string; badge?: string; badgeWarm?: boolean }[] = [
-  { id: "clients",  label: "Clients",  badge: "24" },
-  { id: "activity", label: "Activity", badge: "3", badgeWarm: true },
+  { id: "clients",  label: "Clients" },
+  { id: "activity", label: "Activity"},
   { id: "chat",     label: "Ask AI" },
-];
-
-const QUICK = [
-  { label: "New invoice" },
-  { label: "Reports" },
-  { label: "History" },
 ];
 
 const css = `
@@ -224,20 +218,6 @@ export default function Sidebar() {
           letterSpacing: "-0.03em",
           fontFamily: "var(--sans)",
         }}>inPay</span>
-
-        {/* Workspace badge */}
-        <span style={{
-          marginLeft: "auto",
-          fontSize: 10.5,
-          fontWeight: 500,
-          color: "#9ca3af",
-          background: "#f3f4f6",
-          border: "1px solid #e5e7eb",
-          borderRadius: 4,
-          padding: "1px 6px",
-          letterSpacing: "-0.01em",
-          fontFamily: "var(--sans)",
-        }}>Acme</span>
       </div>
 
       {/* ── Body ── */}
@@ -277,24 +257,7 @@ export default function Sidebar() {
         {/* Divider */}
         <div style={{ height: 1, background: "#f3f4f6", margin: "0 -2px" }} />
 
-        {/* Quick links */}
-        <div>
-          <div className="sb-section-label" style={{ marginBottom: 4 }}>Quick links</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-            {QUICK.map((item) => (
-              <button key={item.label} className="sb-quick-btn">
-                <div style={{
-                  width: 5,
-                  height: 5,
-                  borderRadius: 1.5,
-                  background: "#e5e7eb",
-                  flexShrink: 0,
-                }} />
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </div>
+   
 
         {/* Viewing indicator */}
         {activeView === "customer" && (
@@ -326,87 +289,6 @@ export default function Sidebar() {
             </div>
           </div>
         )}
-      </div>
-
-      {/* ── Footer ── */}
-      <div style={{
-        padding: "8px 10px 12px",
-        borderTop: "1px solid #f3f4f6",
-        display: "flex",
-        flexDirection: "column",
-        gap: 2,
-      }}>
-        {/* Upgrade */}
-        <button className="sb-upgrade-btn">
-          <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-            <span style={{
-              fontSize: 12.5,
-              fontWeight: 500,
-              color: "#374151",
-              letterSpacing: "-0.015em",
-              fontFamily: "var(--sans)",
-            }}>
-              Upgrade to Pro
-            </span>
-            <span style={{
-              fontSize: 11,
-              color: "#9ca3af",
-              fontFamily: "var(--sans)",
-            }}>
-              Unlock all features
-            </span>
-          </div>
-          <svg width="13" height="13" viewBox="0 0 14 14" fill="none" style={{ color: "#9ca3af", flexShrink: 0 }}>
-            <path d="M3 11L11 3M11 3H6M11 3v5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
-
-        {/* User */}
-        <button className="sb-user-row">
-          <div style={{
-            width: 24,
-            height: 24,
-            borderRadius: 6,
-            background: "#18181b",
-            flexShrink: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 9.5,
-            fontWeight: 700,
-            color: "#fff",
-            letterSpacing: "0.02em",
-            fontFamily: "var(--sans)",
-          }}>
-            A
-          </div>
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <div style={{
-              fontSize: 12.5,
-              fontWeight: 500,
-              color: "#18181b",
-              letterSpacing: "-0.015em",
-              lineHeight: 1.3,
-              fontFamily: "var(--sans)",
-            }}>
-              Admin
-            </div>
-            <div style={{
-              fontSize: 11,
-              color: "#9ca3af",
-              lineHeight: 1.3,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              fontFamily: "var(--sans)",
-            }}>
-              admin@acme.io
-            </div>
-          </div>
-          <svg width="11" height="11" viewBox="0 0 14 14" fill="none" style={{ color: "#d1d5db", flexShrink: 0 }}>
-            <path d="M3 5l4 4 4-4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
       </div>
     </aside>
   );
