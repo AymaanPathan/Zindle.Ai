@@ -105,7 +105,7 @@ Two views available: **Flow** (ReactFlow graph) and **Timeline** (chronological 
 ---
 
 ### 3. Ask AI — Reasoning
-
+<img width="2868" height="1298" alt="Image" src="https://github.com/user-attachments/assets/3b321466-9939-415d-b9d7-f33f36075e2a" />
 > _What should I do?_
 
 <!-- IMAGE PLACEHOLDER: AI Chat screenshot -->
