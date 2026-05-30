@@ -159,11 +159,10 @@ const css = `
 
   .ch-rank {
     display: flex; align-items: flex-start; gap: 12px;
-    padding: 12px 0; border-bottom: 1px solid var(--s100);
+    padding: 14px 0; border-bottom: 1px solid var(--s100);
   }
-  .ch-rank:first-child { padding-top: 0; }
-  .ch-rank:last-child  { border-bottom: none; padding-bottom: 0; }
-
+  .ch-rank:first-child { padding-top: 4px; }
+  .ch-rank:last-child  { border-bottom: none; padding-bottom: 4px; }
   .ch-action-item {
     display: flex; align-items: flex-start; gap: 10px;
     background: var(--white); border: 1px solid var(--s200);
@@ -560,18 +559,11 @@ function StatsBlock({ items }: { items: { label: string; value: string; accent?:
 
 function RankedBlock({ items }: { items: RankItem[] }) {
   return (
-    <div className="ch-card">
-      <div className="ch-card-header">
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <path d="M2 10L6 2L10 10" stroke="var(--s500)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M3.5 7.5H8.5" stroke="var(--s500)" strokeWidth="1.4" strokeLinecap="round"/>
-        </svg>
-        <span style={{ fontSize: "11px", fontWeight: 500, color: "var(--s500)", letterSpacing: "-0.01em" }}>Ranked results</span>
-        <span style={{ fontSize: "10.5px", color: "var(--s400)", marginLeft: "auto" }}>{items.length} items</span>
-      </div>
+    <div className="">
       <div className="ch-card-body">
         {items.map((item, idx) => (
           <div key={idx} className="ch-rank ch-slide" style={{ animationDelay: `${idx * 0.03}s` }}>
+            {/* Rank badge */}
             <div style={{
               width: 20, height: 20, borderRadius: 5, flexShrink: 0,
               background: idx === 0 ? "var(--s900)" : "var(--s100)",
@@ -582,13 +574,35 @@ function RankedBlock({ items }: { items: RankItem[] }) {
             }}>
               {item.rank}
             </div>
+
+            {/* Content */}
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 7, flexWrap: "wrap" }}>
-                <span style={{ fontSize: "13px", fontWeight: 500, color: "var(--s900)", letterSpacing: "-0.015em" }}>{item.name}</span>
+              {/* Name — full width, wraps naturally */}
+              <div style={{
+                fontSize: "13px", fontWeight: 500, color: "var(--s900)",
+                letterSpacing: "-0.015em", lineHeight: 1.45,
+                marginBottom: 6, wordBreak: "break-word",
+              }}>
+                {item.name}
+              </div>
+
+              {/* Note (call script) on its own line */}
+              {item.note && (
+                <div style={{
+                  fontSize: "11.5px", color: "var(--s400)",
+                  lineHeight: 1.55, marginBottom: 8,
+                  wordBreak: "break-word",
+                }}>
+                  {item.note}
+                </div>
+              )}
+
+              {/* Tag + Amount row — always below text */}
+              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                 {item.tag && (
                   <span style={{
-                    fontSize: "10px", fontWeight: 500, padding: "2px 7px", borderRadius: 5,
-                    letterSpacing: "0.02em",
+                    fontSize: "10px", fontWeight: 500, padding: "2px 8px",
+                    borderRadius: 5, letterSpacing: "0.02em",
                     background: (item.tagColor || "#4a4a55") + "14",
                     color: item.tagColor || "var(--s600)",
                     border: `1px solid ${(item.tagColor || "#4a4a55") + "28"}`,
@@ -597,14 +611,19 @@ function RankedBlock({ items }: { items: RankItem[] }) {
                   </span>
                 )}
                 {item.amount && (
-                  <span style={{ fontFamily: "var(--mono)", fontSize: "13px", color: "var(--s700)", letterSpacing: "-0.02em", marginLeft: "auto", fontWeight: 500 }}>
+                  <span style={{
+                    fontFamily: "var(--mono)", fontSize: "12.5px",
+                    color: "var(--s700)", letterSpacing: "-0.02em",
+                    fontWeight: 500, marginLeft: "auto",
+                  }}>
                     {item.amount}
                   </span>
                 )}
               </div>
-              {item.note && <div style={{ fontSize: "11.5px", color: "var(--s400)", marginTop: 3, lineHeight: 1.5 }}>{item.note}</div>}
+
+              {/* Progress bar */}
               {item.progress !== undefined && (
-                <div style={{ height: 2, borderRadius: 99, background: "var(--s100)", marginTop: 8, overflow: "hidden" }}>
+                <div style={{ height: 2, borderRadius: 99, background: "var(--s100)", marginTop: 10, overflow: "hidden" }}>
                   <div style={{ height: "100%", borderRadius: 99, width: `${item.progress}%`, background: "var(--s200)", transition: "width 0.5s ease" }} />
                 </div>
               )}
