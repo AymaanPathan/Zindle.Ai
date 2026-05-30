@@ -117,7 +117,10 @@ function ChatTabMockup() {
               ) : (
                 <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
                   <div style={{ width: 22, height: 22, borderRadius: 6, background: "var(--ink)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, fontWeight: 700, color: "#fff", flexShrink: 0, marginTop: 2 }}>iP</div>
-                  
+                  {/* FIX: was missing AiText render */}
+                  <div style={{ background: "var(--surface-2)", border: "1px solid var(--border)", padding: "10px 13px", borderRadius: "3px 13px 13px 13px", maxWidth: "82%" }}>
+                    <AiText text={msg.text} />
+                  </div>
                 </div>
               )}
             </div>
@@ -506,6 +509,7 @@ export default function LandingPage({ onEnterApp }: LandingPageProps) {
         .lp-logo-item { font-size: 13px; font-weight: 500; color: var(--ink-5); letter-spacing: -0.02em; font-family: var(--sans); transition: color 0.12s; }
         .lp-logo-item:hover { color: var(--ink-3); }
 
+        /* FIX: changed background from var(--surface-2) to var(--surface) to remove grey */
         .lp-section { padding: 100px 40px; }
         .lp-section-wrap { max-width: 1080px; margin: 0 auto; }
         .lp-eyebrow { font-size: 11.5px; font-weight: 500; letter-spacing: 0.1em; color: var(--ink-4); text-transform: uppercase; margin-bottom: 12px; }
@@ -575,14 +579,27 @@ export default function LandingPage({ onEnterApp }: LandingPageProps) {
         {/* ── NAV ── */}
         <nav className={`lp-nav${scrolled ? " stuck" : ""}`}>
           <a href="#" className="lp-nav-logo">
-            <div className="lp-nav-logo-mark">iP</div>
+             <div style={{
+          width: 20,
+          height: 20,
+          borderRadius: 5,
+          background: "#18181b",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+        }}>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <rect x="1.5" y="1.5" width="3" height="7" rx="1" fill="white" opacity="0.9"/>
+            <rect x="5.5" y="3.5" width="3" height="5" rx="1" fill="white" opacity="0.55"/>
+          </svg>
+        </div>
             Zindle
           </a>
           <div className="lp-nav-links">
             {["Product", "Solutions", "Pricing", "Company"].map(l => <a key={l} href="#">{l}</a>)}
           </div>
           <div className="lp-nav-right">
-            <button className="btn-ghost" onClick={onEnterApp}>Sign in</button>
             <button className="btn-solid" onClick={onEnterApp}>Get started</button>
           </div>
         </nav>
@@ -669,18 +686,9 @@ export default function LandingPage({ onEnterApp }: LandingPageProps) {
           </div>
         </section>
 
-        {/* ── LOGOS ── */}
-        <div className="lp-logos">
-          <div className="lp-logos-inner">
-            <div className="lp-logos-label">Trusted by teams integrating with</div>
-            <div className="lp-logos-row">
-              {logos.map(l => <span key={l} className="lp-logo-item">{l}</span>)}
-            </div>
-          </div>
-        </div>
 
-        {/* ── PLATFORM (TABS) ── */}
-        <section className="lp-section" style={{ background: "var(--surface-2)" }}>
+        {/* ── PLATFORM (TABS) — FIX: removed background: var(--surface-2) ── */}
+        <section className="lp-section">
           <div className="lp-section-wrap">
             <div className="lp-section-header">
               <div>
@@ -703,7 +711,7 @@ export default function LandingPage({ onEnterApp }: LandingPageProps) {
         </section>
 
         {/* ── WHY Zindle ── */}
-        <section className="lp-section" style={{ background: "var(--surface)" }}>
+        <section className="lp-section" style={{ borderTop: "1px solid var(--border)" }}>
           <div className="lp-section-wrap">
             <div className="lp-section-header">
               <div>
