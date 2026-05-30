@@ -217,7 +217,7 @@ export default function Sidebar() {
           color: "#18181b",
           letterSpacing: "-0.03em",
           fontFamily: "var(--sans)",
-        }}>inPay</span>
+        }}>Zindle</span>
       </div>
 
       {/* ── Body ── */}

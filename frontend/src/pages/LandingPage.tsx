@@ -101,9 +101,9 @@ function ChatTabMockup() {
         <div ref={chatRef} style={{ flex: 1, padding: 16, display: "flex", flexDirection: "column", gap: 12, overflowY: "auto", scrollBehavior: "smooth" }}>
           {visible === 0 && !playing && (
             <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 20px", textAlign: "center" }}>
-              <div style={{ width: 40, height: 40, borderRadius: 10, background: "var(--ink)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, color: "#fff", marginBottom: 14, letterSpacing: "-0.04em" }}>iP</div>
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: "var(--ink)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, color: "#fff", marginBottom: 14, letterSpacing: "-0.04em" }}>ZD</div>
               <div style={{ fontFamily: "var(--serif)", fontSize: 20, fontWeight: 400, color: "var(--ink)", letterSpacing: "-0.02em", marginBottom: 8, fontStyle: "italic" }}>Ask anything.</div>
-              <div style={{ fontSize: 12.5, color: "var(--ink-3)", lineHeight: 1.65, fontWeight: 300, maxWidth: 220, marginBottom: 18 }}>Watch how inPay's AI answers real collections questions in seconds.</div>
+              <div style={{ fontSize: 12.5, color: "var(--ink-3)", lineHeight: 1.65, fontWeight: 300, maxWidth: 220, marginBottom: 18 }}>Watch how Zindle's AI answers real collections questions in seconds.</div>
               <button onClick={handlePlay} style={{ display: "flex", alignItems: "center", gap: 5, padding: "8px 20px", borderRadius: 8, border: "none", background: "var(--ink)", color: "#fff", fontSize: 12.5, fontWeight: 500, fontFamily: "var(--sans)", cursor: "pointer" }}>▶ Play demo</button>
             </div>
           )}
@@ -301,7 +301,7 @@ function ActivityTabMockup() {
   const feedItems = [
     { dot: "#e74c3c", urgency: "Critical", title: "Acme Corp opened invoice 5× — never replied", sub: "₹1,20,000 · 18 days overdue · High risk", ai: "Direct call within 24h — responds 3× better to calls.", pct: "62%", pctClr: "#e74c3c", action: "Draft follow-up", time: "2m" },
     { dot: "#f39c12", urgency: "Watch", title: "Nova LLC stopped engaging after overdue", sub: "₹48,500 · 7 days overdue · Engagement dropped", ai: "Risk of ghosting rising. Outreach within 12h.", pct: "74%", pctClr: "#f39c12", action: "Schedule call", time: "14m" },
-    { dot: "#27ae60", urgency: "Opportunity", title: "InPay reopened payment link twice today", sub: "₹2,80,000 · Strong payment intent", ai: "High intent signal. Send a nudge now.", pct: "91%", pctClr: "#27ae60", action: "Send nudge", time: "31m" },
+    { dot: "#27ae60", urgency: "Opportunity", title: "Zindle reopened payment link twice today", sub: "₹2,80,000 · Strong payment intent", ai: "High intent signal. Send a nudge now.", pct: "91%", pctClr: "#27ae60", action: "Send nudge", time: "31m" },
     { dot: "#f39c12", urgency: "Watch", title: "Orbit Tech email opened at 11:30 PM again", sub: "₹1,85,000 · 12 days overdue · Late-night pattern", ai: "Reach out tomorrow morning for best results.", pct: "58%", pctClr: "#f39c12", action: "Call AM", time: "1h" },
     { dot: "#27ae60", urgency: "Opportunity", title: "Zeta Retail clicked payment link", sub: "₹95,500 · 3 days overdue · High intent", ai: "Highest probability of payment if nudged today.", pct: "88%", pctClr: "#27ae60", action: "Nudge now", time: "2h" },
   ];
@@ -576,7 +576,7 @@ export default function LandingPage({ onEnterApp }: LandingPageProps) {
         <nav className={`lp-nav${scrolled ? " stuck" : ""}`}>
           <a href="#" className="lp-nav-logo">
             <div className="lp-nav-logo-mark">iP</div>
-            inPay
+            Zindle
           </a>
           <div className="lp-nav-links">
             {["Product", "Solutions", "Pricing", "Company"].map(l => <a key={l} href="#">{l}</a>)}
@@ -600,7 +600,7 @@ export default function LandingPage({ onEnterApp }: LandingPageProps) {
             Stop chasing invoices.<br /><em>Start closing them.</em>
           </h1>
           <p className="lp-hero-sub">
-            inPay reconstructs every customer's payment journey, surfaces real-time risk signals, and helps you act — so you recover more, faster.
+            Zindle reconstructs every customer's payment journey, surfaces real-time risk signals, and helps you act — so you recover more, faster.
           </p>
           <div className="lp-hero-ctas">
             <button className="btn-primary-lg" onClick={onEnterApp}>Get started free</button>
@@ -615,14 +615,14 @@ export default function LandingPage({ onEnterApp }: LandingPageProps) {
                 <div className="lp-dot" style={{ background: "#febc2e" }} />
                 <div className="lp-dot" style={{ background: "#28c840" }} />
                 <div className="lp-screen-url">
-                  <div className="lp-screen-url-pill">app.inpay.co/activity</div>
+                  <div className="lp-screen-url-pill">app.Zindle.co/activity</div>
                 </div>
               </div>
               <div className="lp-screen-inner">
                 <div className="app-sidebar">
                   <div className="app-sidebar-brand">
-                    <div className="app-sidebar-mark">iP</div>
-                    <span className="app-sidebar-name">inPay</span>
+                    <div className="app-sidebar-mark">ZD</div>
+                    <span className="app-sidebar-name">Zindle</span>
                   </div>
                   {[
                     { label: "Activity", icon: "◫", on: true },
@@ -645,7 +645,7 @@ export default function LandingPage({ onEnterApp }: LandingPageProps) {
                     {[
                       { dot: "#e74c3c", title: "Acme Corp opened invoice 5× — never replied", sub: "₹1,20,000 · 18 days overdue · High risk", pct: "62%", pctClr: "#e74c3c", action: "Draft follow-up", time: "2m" },
                       { dot: "#f39c12", title: "Nova LLC stopped engaging after overdue", sub: "₹48,500 · 7 days overdue · Engagement dropped", pct: "74%", pctClr: "#f39c12", action: "Schedule call", time: "14m" },
-                      { dot: "#27ae60", title: "InPay reopened payment link twice today", sub: "₹2,80,000 · Strong payment intent", pct: "91%", pctClr: "#27ae60", action: "Send nudge", time: "31m" },
+                      { dot: "#27ae60", title: "Zeka reopened payment link twice today", sub: "₹2,80,000 · Strong payment intent", pct: "91%", pctClr: "#27ae60", action: "Send nudge", time: "31m" },
                       { dot: "#f39c12", title: "Orbit Tech email opened at 11:30 PM again", sub: "₹1,85,000 · 12 days overdue · Late-night pattern", pct: "58%", pctClr: "#f39c12", action: "Call AM", time: "1h" },
                       { dot: "#27ae60", title: "Zeta Retail clicked payment link", sub: "₹95,500 · 3 days overdue · High intent", pct: "88%", pctClr: "#27ae60", action: "Nudge now", time: "2h" },
                     ].map((r, i) => (
@@ -687,7 +687,7 @@ export default function LandingPage({ onEnterApp }: LandingPageProps) {
                 <div className="lp-eyebrow">Platform</div>
                 <h2 className="lp-section-h2">Three surfaces.<br /><em>One revenue brain.</em></h2>
               </div>
-              <p className="lp-section-p">inPay joins Stripe, HubSpot, and Gmail — every decision grounded in full customer context.</p>
+              <p className="lp-section-p">Zindle joins Stripe, HubSpot, and Gmail — every decision grounded in full customer context.</p>
             </div>
 
             <div className="lp-tab-bar">
@@ -702,12 +702,12 @@ export default function LandingPage({ onEnterApp }: LandingPageProps) {
           </div>
         </section>
 
-        {/* ── WHY INPAY ── */}
+        {/* ── WHY Zindle ── */}
         <section className="lp-section" style={{ background: "var(--surface)" }}>
           <div className="lp-section-wrap">
             <div className="lp-section-header">
               <div>
-                <div className="lp-eyebrow">Why inPay</div>
+                <div className="lp-eyebrow">Why Zindle</div>
                 <h2 className="lp-section-h2">Everything you need to<br /><em>recover more revenue</em></h2>
               </div>
               <p className="lp-section-p">Built for founders and collections teams who need operational edge — not another CRM that stores contacts.</p>
@@ -758,8 +758,8 @@ export default function LandingPage({ onEnterApp }: LandingPageProps) {
 
         {/* ── FOOTER ── */}
         <footer className="lp-footer">
-          <span className="lp-footer-logo">inPay</span>
-          <span className="lp-footer-copy">© 2025 inPay. All rights reserved.</span>
+          <span className="lp-footer-logo">Zindle</span>
+          <span className="lp-footer-copy">© 2026 Zindle. All rights reserved.</span>
           <div className="lp-footer-links">
             {["Privacy", "Terms", "Contact"].map(l => <a key={l} href="#">{l}</a>)}
           </div>
