@@ -35,7 +35,7 @@ Instead of isolated invoices and disconnected records, Zindle gives your team a 
 ## Features
 
 ### 1. Dashboard — Visibility
-
+<img width="2868" height="1298" alt="Image" src="https://github.com/user-attachments/assets/e932c7e2-c6f9-4b80-8553-d69da53f05f9" />
 > _What's happening across my customer portfolio?_
 
 <!-- IMAGE PLACEHOLDER: Dashboard overview screenshot -->
