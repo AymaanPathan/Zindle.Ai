@@ -54,6 +54,7 @@ Every metric is computed from live Coral SQL joins across Stripe and HubSpot —
 ---
 
 ### 2. Invoice Journey Graph — Context
+<img width="2868" height="1298" alt="Image" src="https://github.com/user-attachments/assets/c115d3e5-b554-4fd1-b1fc-2788a32d19b2" />
 
 > _Why is this customer behaving this way?_
 
