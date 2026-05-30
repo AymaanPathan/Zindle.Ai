@@ -610,7 +610,6 @@ function InvoiceTable({ invoices, currency }: { invoices: CustomerInvoice[]; cur
                 </td>
                 <td style={{ textAlign: "right" as const }}>
                   <div style={{ display: "flex", gap: 5, justifyContent: "flex-end" }}>
-                    {inv.hosted_invoice_url && <a href={inv.hosted_invoice_url} target="_blank" rel="noopener noreferrer" className="cp-inv-btn" style={{ background: "#111", color: "#fff", border: "1px solid #111" }}>Pay ↗</a>}
                     {inv.invoice_pdf && <a href={inv.invoice_pdf} target="_blank" rel="noopener noreferrer" className="cp-inv-btn" style={{ background: "#fff", color: "#6b7280", border: "1px solid #e8e8e8" }}>PDF ↗</a>}
                   </div>
                 </td>
