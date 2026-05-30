@@ -5,7 +5,25 @@ import { coralSql } from "../coral/mcp";
 import { queries } from "../coral/queries";
 
 const router = Router();
+// Add this helper function at the top of clients.route.ts
+function formatLifecycle(stage: string | null | undefined): string | null {
+  if (!stage) return null;
+  
+  const map: Record<string, string> = {
+    marketingqualifiedlead: "Marketing Qualified Lead",
+    salesqualifiedlead:     "Sales Qualified Lead",
+    lead:                   "Lead",
+    subscriber:             "Subscriber",
+    opportunity:            "Opportunity",
+    customer:               "Customer",
+    evangelist:             "Evangelist",
+    other:                  "Other",
+  };
 
+  return map[stage.toLowerCase()] ?? stage
+    .replace(/([a-z])([A-Z])/g, "$1 $2")   // camelCase → words
+    .replace(/\b\w/g, c => c.toUpperCase()); // Title Case
+}
 function deriveRiskLevel(c: {
   invoice_count: number;
   paid_invoice_count: number;
@@ -52,7 +70,7 @@ router.get("/clients", async (_req, res) => {
         name:      [c.firstname, c.lastname].filter(Boolean).join(" ") || c.email,
         email:     c.email,
         company:   c.company     ?? null,
-        lifecycle: c.lifecyclestage ?? null,
+      lifecycle: formatLifecycle(c.lifecyclestage),
         createdAt: c.hubspot_created_at ?? c.createdate,
 
         // Billing

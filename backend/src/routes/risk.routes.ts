@@ -7,24 +7,20 @@ import { runCoralQuery } from "../coral/client";
 
 const router = Router();
 
-
 router.get("/risk/all", async (req: Request, res: Response) => {
   try {
     const includeAI = req.query.ai === "true";
     const categoryFilter = req.query.category as string | undefined;
     const minScore = req.query.minScore ? Number(req.query.minScore) : 0;
 
-    // 1. Collect signals from all 3 sources
     const signalMap = await collectAllSignals();
 
-    // 2. Score every customer
     let profiles: RiskProfile[] = [];
     for (const signals of signalMap.values()) {
       const profile = calculateRiskScore(signals);
       profiles.push(profile);
     }
 
-    // 3. Apply filters
     if (categoryFilter) {
       profiles = profiles.filter((p) => p.category === categoryFilter);
     }
@@ -32,18 +28,22 @@ router.get("/risk/all", async (req: Request, res: Response) => {
       profiles = profiles.filter((p) => p.score >= minScore);
     }
 
-    // 4. Sort by score descending (most at-risk first)
     profiles.sort((a, b) => b.score - a.score);
 
     let aiInsights: Map<string, any> = new Map();
     if (includeAI && profiles.length > 0) {
-      aiInsights = await generateBatchInsights(profiles, {
-        onlyHighRisk: true,
-        maxConcurrent: 3,
-      });
+      try {
+        aiInsights = await Promise.race([
+          generateBatchInsights(profiles, { onlyHighRisk: true, maxConcurrent: 3 }),
+          new Promise<Map<string, any>>((_, reject) =>
+            setTimeout(() => reject(new Error("Batch AI timeout")), 45_000)
+          ),
+        ]);
+      } catch (aiErr: any) {
+        console.warn("⚠️ Batch AI insights skipped:", aiErr.message);
+      }
     }
 
-    // 6. Build response
     const data = profiles.map((p) => ({
       email: p.email,
       name: p.name,
@@ -57,7 +57,6 @@ router.get("/risk/all", async (req: Request, res: Response) => {
       ...(aiInsights.has(p.email) ? { ai: aiInsights.get(p.email) } : {}),
     }));
 
-    // Summary stats
     const summary = {
       total: profiles.length,
       critical: profiles.filter((p) => p.category === "critical").length,
@@ -69,17 +68,12 @@ router.get("/risk/all", async (req: Request, res: Response) => {
         .reduce((s, p) => s + p.signals.stripe.totalAmountDue, 0),
     };
 
-    res.json({
-      success: true,
-      summary,
-      data,
-    });
+    res.json({ success: true, summary, data });
   } catch (err: any) {
     console.error("❌ /api/risk/all error:", err);
     res.status(500).json({ success: false, error: err.message });
   }
 });
-
 
 router.get("/risk/summary", async (_req: Request, res: Response) => {
   try {
@@ -124,8 +118,11 @@ router.get("/risk/summary", async (_req: Request, res: Response) => {
   }
 });
 
-
 router.get("/risk/:email(*)", async (req: Request, res: Response) => {
+  // Bump timeouts for AI-heavy route
+  req.setTimeout(60_000);
+  res.setTimeout(60_000);
+
   try {
     const { email } = req.params;
     const includeAI = req.query.ai !== "false"; // default true
@@ -134,7 +131,6 @@ router.get("/risk/:email(*)", async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, error: "Invalid email" });
     }
 
-    // 1. Collect signals for this specific customer
     const signals = await collectSignalsForEmail(email);
 
     if (!signals) {
@@ -144,26 +140,30 @@ router.get("/risk/:email(*)", async (req: Request, res: Response) => {
       });
     }
 
-    // 2. Score
     const profile = calculateRiskScore(signals);
-   const [invoices] = await Promise.all([
-    runCoralQuery<any[]>(`
-      SELECT number, status, amount_due, amount_paid,
-        due_date, status_transitions__paid_at, hosted_invoice_url
-      FROM stripe.invoices
-      WHERE LOWER(customer_email) = LOWER('${email.replace(/'/g, "''")}')
-      ORDER BY created DESC
-    `).catch(() => []),
-  ]);
 
-    
-    // 3. AI insight
+    const [invoices] = await Promise.all([
+      runCoralQuery<any[]>(`
+        SELECT number, status, amount_due, amount_paid,
+          due_date, status_transitions__paid_at, hosted_invoice_url
+        FROM stripe.invoices
+        WHERE LOWER(customer_email) = LOWER('${email.replace(/'/g, "''")}')
+        ORDER BY created DESC
+      `).catch(() => []),
+    ]);
+
+    // AI insight — non-blocking: times out gracefully, never fails the request
     let ai = null;
     if (includeAI) {
       try {
-        ai = await generateRiskInsight(profile, invoices);
+        ai = await Promise.race([
+          generateRiskInsight(profile, invoices),
+          new Promise<null>((_, reject) =>
+            setTimeout(() => reject(new Error("AI timeout")), 30_000)
+          ),
+        ]);
       } catch (aiErr: any) {
-        console.error("⚠️ AI insight failed (non-fatal):", aiErr.message);
+        console.warn("⚠️ AI insight skipped:", aiErr.message);
       }
     }
 
@@ -189,7 +189,5 @@ router.get("/risk/:email(*)", async (req: Request, res: Response) => {
     res.status(500).json({ success: false, error: err.message });
   }
 });
-
-
 
 export default router;

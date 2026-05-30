@@ -24,6 +24,7 @@ export const fetchRiskByEmail = async (
 ): Promise<RiskDetailResponse> => {
   const { data } = await api.get<RiskDetailResponse>(
     `/risk/${encodeURIComponent(email)}`,
+    { timeout: 60_000 }, 
   );
   return data;
 };
