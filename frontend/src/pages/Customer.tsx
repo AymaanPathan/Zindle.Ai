@@ -715,43 +715,141 @@ function RiskIntelTab({ email }: { email: string }) {
       </div>
 
       {/* AI Analysis */}
-      {riskDetail.ai && (() => {
-        const u = getUrgencyStyle(riskDetail.ai.urgency);
-        return (
-          <div style={{ background: "#0f1117", borderRadius: 12, overflow: "hidden", border: "1px solid #1e2433" }}>
-            <div style={{ height: 2, background: "linear-gradient(90deg,#6366f1,#8b5cf6,#a78bfa)" }} />
-            <div style={{ padding: "18px 20px" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-                <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 99, padding: "3px 10px", fontSize: 10, fontWeight: 700, color: "#a5b4fc", letterSpacing: "0.07em", textTransform: "uppercase" as const }}>
-                  <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#818cf8" }} />
-                  AI Analysis
-                </div>
-                <div style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "4px 10px", borderRadius: 6, background: `${u.dot}20`, border: `1px solid ${u.dot}40`, fontSize: 10.5, fontWeight: 700, color: u.dot }}>
-                  <span style={{ width: 5, height: 5, borderRadius: "50%", background: u.dot }} />
-                  {u.label}
-                </div>
-              </div>
-              <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "14px 16px", marginBottom: 14 }}>
-                <div style={{ fontSize: 9.5, fontWeight: 700, color: "#475569", textTransform: "uppercase" as const, letterSpacing: "0.1em", marginBottom: 8 }}>Situation</div>
-                <p style={{ fontSize: 13, color: "#cbd5e1", lineHeight: 1.75, margin: 0, letterSpacing: "-0.01em" }}>{riskDetail.ai.situation}</p>
-              </div>
-              {riskDetail.ai.actions?.length > 0 && (
-                <>
-                  <div style={{ fontSize: 9.5, fontWeight: 700, color: "#475569", textTransform: "uppercase" as const, letterSpacing: "0.1em", marginBottom: 8 }}>Recommended actions</div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                    {riskDetail.ai.actions.map((action: string, i: number) => (
-                      <div key={i} className="cp-action-row">
-                        <div style={{ width: 20, height: 20, borderRadius: 5, flexShrink: 0, background: "rgba(99,102,241,0.2)", border: "1px solid rgba(99,102,241,0.35)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9.5, fontWeight: 800, color: "#a5b4fc" }}>{i + 1}</div>
-                        <span style={{ fontSize: 12.5, color: "#94a3b8", lineHeight: 1.65, letterSpacing: "-0.01em" }}>{action}</span>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
+   {/* AI Analysis */}
+{riskDetail.ai && (() => {
+  const u = getUrgencyStyle(riskDetail.ai.urgency);
+  const urgencyBg: Record<string, string> = {
+    immediate: "#fef2f2",
+    high:      "#fff7ed",
+    medium:    "#fffbeb",
+    low:       "#f0fdf4",
+  };
+  const urgencyBorder: Record<string, string> = {
+    immediate: "#fecaca",
+    high:      "#fed7aa",
+    medium:    "#fde68a",
+    low:       "#d1fae5",
+  };
+  const urgencyTextColor: Record<string, string> = {
+    immediate: "#b91c1c",
+    high:      "#9a3412",
+    medium:    "#92400e",
+    low:       "#15803d",
+  };
+  const urg = riskDetail.ai.urgency ?? "low";
+
+  return (
+    <div style={{
+      background: "#fff",
+      borderRadius: 12,
+      border: "1px solid #e8e8e8",
+      overflow: "hidden",
+    }}>
+      {/* Header */}
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "14px 18px",
+        borderBottom: "1px solid #f5f5f5",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+          <div style={{
+            width: 26, height: 26, borderRadius: 7,
+            background: "#f5f5f5",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
+              <path d="M7 1v2M7 11v2M1 7h2M11 7h2M3.2 3.2l1.4 1.4M9.4 9.4l1.4 1.4M3.2 10.8l1.4-1.4M9.4 4.6l1.4-1.4" stroke="#6b7280" strokeWidth="1.3" strokeLinecap="round"/>
+            </svg>
           </div>
-        );
-      })()}
+          <span style={{ fontSize: 13, fontWeight: 600, color: "#111", letterSpacing: "-0.02em" }}>
+            AI analysis
+          </span>
+          <span style={{
+            fontSize: 9, fontWeight: 700, letterSpacing: "0.06em",
+            color: "#1d4ed8", background: "#eff6ff",
+            border: "1px solid #bfdbfe",
+            padding: "1px 5px", borderRadius: 3,
+            textTransform: "uppercase" as const,
+          }}>AI</span>
+        </div>
+        <span style={{
+          display: "inline-flex", alignItems: "center", gap: 5,
+          padding: "4px 10px", borderRadius: 6,
+          background: urgencyBg[urg] ?? "#f5f5f5",
+          border: `1px solid ${urgencyBorder[urg] ?? "#e8e8e8"}`,
+          fontSize: 11, fontWeight: 600,
+          color: urgencyTextColor[urg] ?? "#6b7280",
+          letterSpacing: "-0.01em",
+        }}>
+          <span style={{ width: 5, height: 5, borderRadius: "50%", background: u.dot, flexShrink: 0 }} />
+          {u.label}
+        </span>
+      </div>
+
+      {/* Situation */}
+      <div style={{ padding: "16px 18px", borderBottom: riskDetail.ai.actions?.length ? "1px solid #f5f5f5" : "none" }}>
+        <div style={{
+          fontSize: 9.5, fontWeight: 700, color: "#9ca3af",
+          textTransform: "uppercase" as const, letterSpacing: "0.08em",
+          marginBottom: 8,
+        }}>
+          Situation
+        </div>
+        <p style={{
+          fontSize: 13, color: "#374151",
+          lineHeight: 1.75, margin: 0,
+          letterSpacing: "-0.01em",
+        }}>
+          {riskDetail.ai.situation}
+        </p>
+      </div>
+
+      {/* Recommended actions */}
+      {riskDetail.ai.actions?.length > 0 && (
+        <div style={{ padding: "14px 18px" }}>
+          <div style={{
+            fontSize: 9.5, fontWeight: 700, color: "#9ca3af",
+            textTransform: "uppercase" as const, letterSpacing: "0.08em",
+            marginBottom: 10,
+          }}>
+            Recommended actions
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {riskDetail.ai.actions.map((action: string, i: number) => (
+              <div key={i} style={{
+                display: "flex", alignItems: "flex-start", gap: 10,
+                padding: "10px 12px",
+                borderRadius: 8,
+                border: "1px solid #f0f0f0",
+                background: "#fafafa",
+                transition: "border-color 0.1s",
+              }}
+                onMouseEnter={e => (e.currentTarget.style.borderColor = "#e0e0e0")}
+                onMouseLeave={e => (e.currentTarget.style.borderColor = "#f0f0f0")}
+              >
+                <div style={{
+                  width: 20, height: 20, borderRadius: 5, flexShrink: 0,
+                  background: "#f0f0f0",
+                  border: "1px solid #e8e8e8",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 10, fontWeight: 700, color: "#6b7280",
+                }}>
+                  {i + 1}
+                </div>
+                <span style={{
+                  fontSize: 12.5, color: "#374151",
+                  lineHeight: 1.65, letterSpacing: "-0.01em",
+                }}>
+                  {action}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+})()}
 
       {/* Score breakdown */}
       {riskDetail.breakdown?.length > 0 && (
