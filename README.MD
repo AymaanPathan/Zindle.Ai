@@ -145,12 +145,7 @@ Intent classification routes each query to the right handler — no hallucinated
 ---
 
 ### 4. Activity — Execution
-
-> _Take action._
-
-<!-- IMAGE PLACEHOLDER: Activity / client cards screenshot -->
-<!-- Place your Activity view screenshot here -->
-<!-- Example: ![Activity View](./docs/images/activity.png) -->
+<img width="2868" height="1298" alt="Image" src="https://github.com/user-attachments/assets/a3a64e4c-3155-416d-ae99-1a2aa2268d50" />
 
 The Activity view lists all clients as cards with real-time risk signals, outstanding balances, and lifecycle stage. Filter by risk level, search by name, sort by amount due.
 
