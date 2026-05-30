@@ -1,5 +1,5 @@
 # Zindle.AI — Collections Intelligence Platform
-
+<img width="2868" height="1298" alt="Image" src="https://github.com/user-attachments/assets/2ad5fafc-cc0c-4894-a04a-1404c9ed816d" />
 > Most businesses don't have a collections problem. They have a visibility problem.
 
 Customer information lives in HubSpot. Invoices live in Stripe. Conversations live in email. Every time a payment gets delayed, teams jump between systems trying to understand what happened, what changed, and what to do next.
