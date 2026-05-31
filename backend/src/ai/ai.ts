@@ -46,15 +46,14 @@ function buildProfileContext(profile: RiskProfile, invoices?: any[]): string {
     .map((b) => `  - [${b.source.toUpperCase()}] ${b.reason} (+${b.points} pts)`)
     .join("\n");
 
-  // Format invoice details
   const invoiceLines = invoices?.map(inv => {
     const due = inv.due_date
-      ? new Date(Number(inv.due_date) * 1000).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })
+      ? new Date(Number(inv.due_date) * 1000).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
       : "—";
     const paidAt = inv.status_transitions__paid_at
-      ? new Date(Number(inv.status_transitions__paid_at) * 1000).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })
+      ? new Date(Number(inv.status_transitions__paid_at) * 1000).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
       : null;
-    const amount = `$${(Number(inv.amount_due) / 100).toLocaleString()}`;
+    const amount = `₹${(Number(inv.amount_due) / 100).toLocaleString("en-IN")}`;
     const daysUntilDue = inv.due_date
       ? Math.floor((Number(inv.due_date) * 1000 - Date.now()) / 86_400_000)
       : null;
@@ -80,7 +79,7 @@ RAW SIGNAL DATA:
   Stripe:
     - Days overdue: ${signals.stripe.daysOverdue}
     - Open invoices: ${signals.stripe.openInvoiceCount}
-    - Total amount due: $${(signals.stripe.totalAmountDue / 100).toLocaleString()}
+    - Total amount due: ₹${(signals.stripe.totalAmountDue / 100).toLocaleString("en-IN")}
     - Failed payments: ${signals.stripe.hasFailedPayment ? "YES" : "no"}
     - Historical late payments: ${signals.stripe.previousLatePayments}
     - Payment success rate: ${Math.round(signals.stripe.paymentSuccessRate * 100)}%
@@ -102,10 +101,10 @@ export interface AIInsight {
 export async function generateRiskInsight(profile: RiskProfile, invoices?: any[]): Promise<AIInsight> {
   const context = buildProfileContext(profile, invoices);
 
-const systemPrompt = `You are a B2B customer success AI assistant.
+  const systemPrompt = `You are a B2B customer success AI assistant.
 Your job is to analyze customer risk signals and generate actionable insights for account managers.
 Be concise, specific, and direct. Do NOT be vague or generic.
-IMPORTANT: All monetary amounts in the profile are already in USD dollars (e.g. $16,500 means sixteen thousand five hundred dollars). Do not multiply or modify these amounts.
+IMPORTANT: All monetary amounts in the profile are in Indian Rupees (INR). Use the ₹ symbol. Do not convert or modify these amounts.
 Always respond with valid JSON only — no markdown, no explanation outside the JSON.`;
 
   const userPrompt = `
@@ -134,16 +133,16 @@ Respond ONLY with valid JSON. Example structure:
   try {
     const parsed = JSON.parse(cleaned);
     return {
-      situation:     parsed.situation     ?? "Unable to generate situation summary.",
-      actions:       Array.isArray(parsed.actions) ? parsed.actions : [],
-      urgency:       parsed.urgency       ?? "medium",
+      situation: parsed.situation ?? "Unable to generate situation summary.",
+      actions:   Array.isArray(parsed.actions) ? parsed.actions : [],
+      urgency:   parsed.urgency ?? "medium",
     };
   } catch (e) {
     console.error("❌ Failed to parse Groq response:", cleaned);
     return {
-      situation:     "AI analysis unavailable.",
-      actions:       ["Review manually", "Check payment status", "Contact customer"],
-      urgency:       "medium",
+      situation: "AI analysis unavailable.",
+      actions:   ["Review manually", "Check payment status", "Contact customer"],
+      urgency:   "medium",
     };
   }
 }

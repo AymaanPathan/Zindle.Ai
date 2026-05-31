@@ -768,15 +768,6 @@ function ChatHeader({ hasMessages, onClear }: { hasMessages: boolean; onClear: (
   );
 }
 
-const SUGGESTIONS = [
-  { text: "Who should I call today?" },
-  { text: "Show all overdue invoices" },
-  { text: "Which customers are at churn risk?" },
-  { text: "Revenue summary this month" },
-  { text: "Highest outstanding balances" },
-  { text: "Who pays late but always converts?" },
-];
-
 function EmptyState({ onSend }: { onSend: (t: string) => void }) {
   return (
     <div style={{
@@ -789,9 +780,6 @@ function EmptyState({ onSend }: { onSend: (t: string) => void }) {
     }}>
       <div style={{ width: "100%", maxWidth: 460 }}>
         <div className="ch-fade-up" style={{ marginBottom: 32 }}>
-          <div style={{ marginBottom: 16 }}>
-            <LogoMark size={32} />
-          </div>
           <h1 style={{
             fontFamily: "var(--serif)",
             fontSize: "clamp(28px, 4vw, 38px)",
@@ -809,21 +797,7 @@ function EmptyState({ onSend }: { onSend: (t: string) => void }) {
           </p>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 5 }} className="ch-fade-up">
-          {SUGGESTIONS.map((s, i) => (
-            <button
-              key={s.text}
-              className="ch-suggestion"
-              onClick={() => onSend(s.text)}
-              style={{ animationDelay: `${0.05 + i * 0.03}s` }}
-            >
-              <span>{s.text}</span>
-              <svg className="ch-suggestion-arrow" width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M3 7h8M8 4l3 3-3 3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
-          ))}
-        </div>
+     
       </div>
     </div>
   );
