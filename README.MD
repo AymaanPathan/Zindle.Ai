@@ -582,23 +582,3 @@ PORT=5000
 | `GET` | `/api/risk/all` | Risk scores for all customers |
 | `GET` | `/api/risk/summary` | Portfolio risk summary |
 | `GET` | `/api/risk/:email` | Risk profile for one customer |
-
----
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/your-feature`
-3. Commit your changes: `git commit -m 'Add your feature'`
-4. Push to the branch: `git push origin feature/your-feature`
-5. Open a pull request
-
----
-
-## License
-
-MIT — see [LICENSE](./LICENSE) for details.
-
----
-
-<p align="center">Built with <a href="https://withcoral.com/docs">Coral</a> · <a href="https://groq.com">Groq</a> · <a href="https://stripe.com">Stripe</a> · <a href="https://hubspot.com">HubSpot</a> · <a href="https://resend.com">Resend</a> · <a href="https://supabase.com">Supabase</a></p>
