@@ -27,7 +27,7 @@ Invoices             →  Stripe
 Conversations        →  Gmail
 ```
 
-Instead of isolated invoices and disconnected records, Zindle gives your team a **living customer intelligence layer** powered by [Coral](https://withcoral.com/docs) — joining all three data sources in real time.
+Instead of isolated invoices and disconnected records, Zindle gives your team a **living customer intelligence layer** powered by [Coral](https://withcoral.com/docs) — joining all data sources in real time.
 
 ---
 
