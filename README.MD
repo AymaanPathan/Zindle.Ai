@@ -229,10 +229,6 @@ Coral executes this locally on your machine — no data leaves, no external serv
 
 HubSpot is not bundled in Coral by default. We connect it using a **[custom source spec](https://withcoral.com/docs/guides/write-a-custom-source)** — a YAML file that tells Coral how to authenticate against the HubSpot API and which tables to expose.
 
-```bash
-# Add HubSpot as a custom Coral source
-coral source add --file ./hubspot-source.yaml --interactive
-```
 
 The source spec defines:
 
