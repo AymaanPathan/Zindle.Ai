@@ -1,4 +1,3 @@
-// Responsibilities: explain WHY, recommend WHAT TO DO, draft outreach.
 
 import { RiskProfile } from "../risk/signals";
 
